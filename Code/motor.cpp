@@ -120,10 +120,6 @@ void InitialiseMotor()
     MotorPWM.period_us(PWM_PRD);
     MotorPWM.pulsewidth_us(PWM_PRD);
     
-    //Initialise the serial port
-    //Serial pc(SERIAL_TX, SERIAL_RX);
-    pc.printf("Hello\n\r");
-    
     //Run the motor synchronisation
     orState = motorHome();
     pc.printf("Rotor origin: %x\n\r",orState);
