@@ -23,7 +23,7 @@ void computeHash()
 
         if(hash[0]==0 && hash[1]==0)
         {
-            putMessage(*nonce);
+            //putMessage(*nonce);
         }
 
         *nonce += 1;

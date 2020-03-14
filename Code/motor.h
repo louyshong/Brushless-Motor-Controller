@@ -34,7 +34,9 @@
 #define TP1pin D13
 #define TP2pin A2
 
+extern Thread motorCtrlT;
+
 //Main thread to instantiate
-void MotorMain();
+void motorCtrlFn();
 
 #endif

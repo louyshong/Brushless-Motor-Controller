@@ -4,6 +4,7 @@
 #include "bitcoin.h"
 #include "messages.h"
 #include "string"
+#include "tune.h"
 
 //########################################################
 //------------------- Define Threads ---------------------
@@ -11,18 +12,20 @@
 Thread MessengerThread;
 Thread TerminaListenerThread;
 Thread BitcoinThread;
-Thread MotorThread;
-
+Thread motorCtrlT(osPriorityHigh, 1024);
+Thread tuneThread(osPriorityHigh, 1024);
 
 //########################################################
 //-------------------- Main Method -----------------------
 //########################################################
-int main() {
-
+int main() 
+{
+    //start threads
     MessengerThread.start(callback(outputToTerminal));
     TerminaListenerThread.start(callback(listenToTerminal));
     BitcoinThread.start(callback(computeHash));
-    MotorThread.start(callback(MotorMain));
+    motorCtrlT.start(callback(motorCtrlFn));
+    tuneThread.start(callback(playTune_thread));
 
 }
 

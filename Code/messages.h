@@ -2,15 +2,18 @@
 #define MESSAGES
 
 #include "mbed.h"
+#include "string"
+#include "motor.h"
+#include "bitcoin.h"
 
 extern RawSerial pc;
 
 typedef struct {
-  uint8_t    printValue;
+  double    printValue;
 } mail_t;
 
 void outputToTerminal();
-extern void putMessage(uint8_t counter);
+extern void putMessage(double counter);
 void listenToTerminal();
 
 #endif

@@ -26,7 +26,6 @@ const int8_t lead = 2;  //2 for forwards, -2 for backwards
 //Status LED
 DigitalOut led1(LED1);
 
-
 //Photointerrupter inputs
 InterruptIn I1(I1pin);
 InterruptIn I2(I2pin);
@@ -85,14 +84,33 @@ int8_t motorHome() {
 int8_t intState = 0;
 int8_t intStateOld = 0;
 int8_t orState = 0;
+int64_t position = 0;
+int64_t positionOld = 0;
+int8_t direction = 0;
 
 //Poll the rotor state and set the motor outputs accordingly to spin the motor
 void UpdateMotorPosition()
 {
     intState = readRotorState();
-    motorOut((intState-orState+lead+6)%6); //+6 to make sure the remainder is positive
+    int8_t direction_detected = intState - intStateOld;
+
+    //Update position
+    if (direction_detected > 0) {
+        position++; 
+    }
+    if (direction_detected < 0) {
+        position--;
+    }
+
+    //Update direction
+    if ((direction_detected != direction) && (abs(direction_detected) < 5)) {
+        direction = (direction_detected > 0) - (direction_detected < 0); 
+    }
+
     intStateOld = intState;
-  
+    
+    //Call motorOut
+    motorOut((intState - orState + lead + 6) % 6); //+6 to make sure the remainder is positive    
 }
 
 
@@ -119,8 +137,71 @@ void InitialiseMotor()
     I3.fall(&UpdateMotorPosition);
 }
 
-void MotorMain()
+//Thread motorCtrlT (osPriorityNormal,1024);
+
+void motorCtrlTick()
 {
+    motorCtrlT.signal_set(0x1);
+ }
+
+
+void motorCtrlFn()
+{
+    //start the motor
     InitialiseMotor(); 
+
+    Ticker motorCtrlTicker;
+    motorCtrlTicker.attach_us(&motorCtrlTick, 100000);
+
+    Timer velocityTimer;
+    velocityTimer.start();
+
+    while (1) {
+        motorCtrlT.signal_wait(0x1); //wait for signal (every 100ms)
+
+        //calculate velocity
+        double velocity = (position - positionOld) * (1 / (double)velocityTimer.read()); //calculating time taken for each revolution (this seems wrong, need to ask about it) 
+ 
+        //incremement counter
+        motorCtrlCounter++;
+        
+        //calculate y_r
+        targetPosition_mutex.lock();
+        double posError = targetPosition - position;
+        double posErrorOld = targetPosition - positionOld;
+        double y_r = (85*posError) + (15*(posError - posErrorOld)/((double)velocityTimer.read()));
+        
+        double vError = (((posError > 0) - (posError < 0))*(maxSpeed) - velocity);
+        
+        double intvError =+ vError/0.1;
+
+        if(intvError > 880) intvError = 880;
+        if(intvError < -880) intvError = -880;
+        
+        //calculate y_s
+        maxSpeed_mutex.lock();
+        double y_s= (15 * vError)+(15*intvError);
+        
+        if (motorCtrlCounter == 50) { //print measurements every 5s
+            motorCtrlCounter = 0; //reset counter
+            putMessageM(direction, (velocity/6), (maxSpeed/6), (targetPosition/6), (float(position)/6)); //output message
+        }
+        
+        targetPosition_mutex.unlock();
+        maxSpeed_mutex.unlock();
+        
+        //set motorPower
+        motorPower_mutex.lock();
+        if (velocity>=0){
+            motorPower = std::min(y_s,y_r);
+        }
+        else{
+            motorPower = std::max(y_s,y_r);
+        }
+        motorPower_mutex.unlock();
+        
+        velocityTimer.reset();
+        positionOld = position;
 }
+
 
