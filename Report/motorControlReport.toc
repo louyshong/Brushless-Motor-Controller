@@ -1,0 +1,32 @@
+\babel@toc {english}{}
+\contentsline {section}{\numberline {1}Introduction}{1}{section.1}% 
+\contentsline {subsection}{\numberline {1.1}Brief}{1}{subsection.1.1}% 
+\contentsline {subsection}{\numberline {1.2}Specification}{1}{subsection.1.2}% 
+\contentsline {paragraph}{This is a paragraph}{1}{section*.2}% 
+\contentsline {subparagraph}{And this is a subparagraph}{1}{section*.3}% 
+\contentsline {section}{\numberline {2}Motor Control Implementation}{2}{section.2}% 
+\contentsline {subsection}{\numberline {2.1}Position and Velocity Measurements}{2}{subsection.2.1}% 
+\contentsline {subsection}{\numberline {2.2}Velocity Control}{2}{subsection.2.2}% 
+\contentsline {subsection}{\numberline {2.3}Position Control}{2}{subsection.2.3}% 
+\contentsline {section}{\numberline {3}Motor Melody Implementation}{2}{section.3}% 
+\contentsline {section}{\numberline {4}Tasks and Dependencies}{2}{section.4}% 
+\contentsline {subsection}{\numberline {4.1}Motor Control}{2}{subsection.4.1}% 
+\contentsline {subsection}{\numberline {4.2}Melody}{2}{subsection.4.2}% 
+\contentsline {subsection}{\numberline {4.3}Decoding Messages}{2}{subsection.4.3}% 
+\contentsline {subsection}{\numberline {4.4}Outputting Messages}{2}{subsection.4.4}% 
+\contentsline {subsection}{\numberline {4.5}SHA-256 Hashing}{2}{subsection.4.5}% 
+\contentsline {subsection}{\numberline {4.6}Dependency Graph}{2}{subsection.4.6}% 
+\contentsline {section}{\numberline {5}Timings and CPU Utilisation}{2}{section.5}% 
+\contentsline {subsection}{\numberline {5.1}Methodology}{2}{subsection.5.1}% 
+\contentsline {subsection}{\numberline {5.2}Measure Results}{2}{subsection.5.2}% 
+\contentsline {subsection}{\numberline {5.3}Critical Instant Analysis of the Rate Monotonic Scheduler}{2}{subsection.5.3}% 
+\contentsline {section}{\numberline {6}Highlighting and footnotes}{2}{section.6}% 
+\contentsline {section}{\numberline {7}Equations}{3}{section.7}% 
+\contentsline {subsection}{\numberline {7.1}As part of text}{3}{subsection.7.1}% 
+\contentsline {subsection}{\numberline {7.2}In the middle, not numbered}{3}{subsection.7.2}% 
+\contentsline {subsubsection}{\numberline {7.2.1}And in the middle, numbered}{3}{subsubsection.7.2.1}% 
+\contentsline {section}{\numberline {8}Adding images}{3}{section.8}% 
+\contentsline {subsubsection}{\numberline {8.0.1}Images side by side}{3}{subsubsection.8.0.1}% 
+\contentsline {section}{\numberline {9}Citing and referencing}{3}{section.9}% 
+\contentsline {subsection}{\numberline {9.1}Referencing figures and equations}{3}{subsection.9.1}% 
+\contentsline {subsection}{\numberline {9.2}Citing a paper}{3}{subsection.9.2}% 
