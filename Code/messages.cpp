@@ -4,6 +4,7 @@ Mail<mail_t, 16> mail_box;
 Mail<uint8_t, 8> inCharQ;
 RawSerial pc(SERIAL_TX, SERIAL_RX);
 
+
 //#######################################################################
 //------------------------ Output Functions------------------------------
 //#######################################################################
@@ -11,13 +12,21 @@ RawSerial pc(SERIAL_TX, SERIAL_RX);
 void outputToTerminal (void) {
     while(true)
     {
+        //check each mailbox
         osEvent evt = mail_box.get();
-        if (evt.status == osEventMail) {
+        if (evt.status == osEventMail) 
+        {
             mail_t *mail = (mail_t*)evt.value.p;
-            pc.printf("\nNounce Found: %f \n"   , mail->printValue);
+            if(mail->printValue != NULL)
+                pc.printf("\nNounce Found: %f \n"   , mail->printValue);
+
+            if(mail->message != "")
+                pc.printf("\nNounce Found: %s \n"   , mail->message.c_str());
             
             mail_box.free(mail);
         }
+
+
     }
 }
 
@@ -26,6 +35,13 @@ void putMessage(double counter)
    mail_t *mail = mail_box.alloc();
    mail->printValue = counter;
    mail_box.put(mail);
+}
+
+void putMessage(std::string message)
+{
+    mail_t *mail = mail_box.alloc();
+    mail->message = message;
+    mail_box.put(mail);
 }
 
 
@@ -41,42 +57,23 @@ void serialISR()
    inCharQ.put(newChar);
 }
 
-bool decodeSpeedCommand(std::string input)
+void decodeSpeedCommand(std::string input)
 {
-    //Decode maximum speed command
-    if (std::regex_match(input, std::regex("V(\\d){1,3}(\\.\\d+)?\u000D"))) 
-    { 
+    //Decode maximum speed input
+    if (std::regex_match(input, std::regex("V(\\d){1,3}(\\.\\d+)?\u000D"))) { 
         float speed;
         char firstChar;
         sscanf(input.c_str(), "%c %f", &firstChar, &speed);
         maxSpeed_mutex.lock();
         maxSpeed = (speed*6);//convert input to segments per second
         maxSpeed_mutex.unlock();
-        //pc.printf("Max Speed: %f\n\r", max_speed);
-        return true;
+        putMessage("Got Speed Command");
     }
-    return false;
-
 }
 
-bool decodeBitCoinKey(std::string input)
+void decodePositionCommand(std::string input)
 {
-    if(command[0] == 'K') 
-    {
-        char firstChar;
-        uint64_t key;
-        sscanf(input.c_str(), "%c %llx", &firstChar, &key); //llx formatter since uint64 is unsigned long long 
-        pc.printf("New Key: %llx\n\r", key);
-        newKey_mutex.lock();
-        newKey = key;
-        newKey_mutex.unlock();
-    }
-    return false;
-}
-
-bool decodeTargetPositionCommand(std::string input)
-{
-    //Decode target position command
+    //Decode target position input
     if (std::regex_match(input, std::regex("R(-)?(\\d){1,4}(\\.\\d+)?\u000D")))
     {
         float rotation; 
@@ -85,10 +82,26 @@ bool decodeTargetPositionCommand(std::string input)
         targetPosition_mutex.lock();
         targetPosition = position + (rotation*6);//convert input to segments
         targetPosition_mutex.unlock();
+        putMessage("Got Position Command");
     }
 }
 
-bool decodeMelodyCommand(std::string input)
+void decodeKeyCommand(std::string input)
+{
+    if(input[0] == 'K') 
+    {
+        char firstChar;
+        uint64_t key;
+        sscanf(input.c_str(), "%c %llx", &firstChar, &key); //llx formatter since uint64 is unsigned long long 
+        pc.printf("New Key: %llx\n\r", key);
+        newKey_mutex.lock();
+        newKey = key;
+        newKey_mutex.unlock();
+        putMessage("Got Key Command");
+    }
+}
+
+void decodeTuneCommand(std::string input)
 {
     if(input[0] == 'T') 
     {
@@ -102,7 +115,8 @@ bool decodeMelodyCommand(std::string input)
             tonesQ.pop();    
         }
         
-        for(int i = 1; i < input.length(); i++) {
+        for(int i = 1; i < input.length(); i++) 
+        {
             if(input[i] == 'A' || input[i] == 'B' || input[i] == 'C' || input[i] == 'D' || 
                 input[i] == 'E' || input[i] == 'F' || input[i] == 'G') {
                 tone = "";
@@ -125,11 +139,15 @@ bool decodeMelodyCommand(std::string input)
     }
 }
 
-void listenToTerminal()
-{
+void decodeinput_thread () {
+
     pc.attach(&serialISR);
     std::string command;
     
+    //initilise varibles to default start values
+    maxSpeed = 600;
+    targetPosition = 0;
+
     while (true) 
     {
         //Store the new character
@@ -137,18 +155,16 @@ void listenToTerminal()
         uint8_t* newChar = (uint8_t*)newEvent.value.p;
         command += (char)*newChar;
         inCharQ.free(newChar);
-
-
-        //Decode the command if it is complete
+        
+        //Decode the input if it is complete
         if (command.back() == '\r') 
-        {
-          //decode command  
-            if(!decodeSpeedCommand(command))
-                if(!decodeTargetPositionCommand(command))
-                    if(!decodeBitCoinKey(command))  
-                        decodeMelodyCommand(command);
-            
-            command = ""; //Reset command
+        {    
+            decodeSpeedCommand(command);
+            decodePositionCommand(command);
+            decodeKeyCommand(command);
+            decodeTuneCommand(command);
+            putMessage("Got Something");
+            command = ""; //Reset input
         } 
-    } 
+    }
 }

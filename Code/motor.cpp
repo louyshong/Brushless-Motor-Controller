@@ -87,6 +87,8 @@ int8_t orState = 0;
 int64_t position = 0;
 int64_t positionOld = 0;
 int8_t direction = 0;
+int64_t motorCtrlCounter = 0;
+double motorPower = 0; //controller output
 
 //Poll the rotor state and set the motor outputs accordingly to spin the motor
 void UpdateMotorPosition()
@@ -133,12 +135,11 @@ void InitialiseMotor()
     I3.fall(&UpdateMotorPosition);
 }
 
-//Thread motorCtrlT (osPriorityNormal,1024);
 
 void motorCtrlTick()
 {
     motorCtrlT.signal_set(0x1);
- }
+}
 
 
 void motorCtrlFn()
@@ -152,7 +153,8 @@ void motorCtrlFn()
     Timer velocityTimer;
     velocityTimer.start();
 
-    while (1) {
+    while (1) 
+    {
         motorCtrlT.signal_wait(0x1); //wait for signal (every 100ms)
 
         //calculate velocity
@@ -180,7 +182,7 @@ void motorCtrlFn()
         
         if (motorCtrlCounter == 50) { //print measurements every 5s
             motorCtrlCounter = 0; //reset counter
-            putMessageM(direction, (velocity/6), (maxSpeed/6), (targetPosition/6), (float(position)/6)); //output message
+            //putMessageM(direction, (velocity/6), (maxSpeed/6), (targetPosition/6), (float(position)/6)); //output message
         }
         
         targetPosition_mutex.unlock();
@@ -198,6 +200,7 @@ void motorCtrlFn()
         
         velocityTimer.reset();
         positionOld = position;
+    }
 }
 
 

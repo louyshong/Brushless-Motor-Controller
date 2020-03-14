@@ -3,7 +3,7 @@
 
 #include "mbed.h"
 #include "messages.h"
-//#include "decode.h"
+#include "decode.h"
 
 
 //Photointerrupter input pins
@@ -35,6 +35,14 @@
 #define TP2pin A2
 
 extern Thread motorCtrlT;
+extern PwmOut MotorPWM;
+
+extern int8_t intState;
+extern int8_t intStateOld;
+extern int8_t orState;
+extern int64_t position;
+extern int64_t positionOld;
+extern int8_t direction;
 
 //Main thread to instantiate
 void motorCtrlFn();
