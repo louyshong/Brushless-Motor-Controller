@@ -1,6 +1,8 @@
 #include "bitcoin.h"
 #include "messages.h"
 
+Mutex newKey_mutex;
+
 //------------------- Bitcoin Mining ------------------------
 void computeHash()
 {
@@ -16,14 +18,20 @@ void computeHash()
     uint64_t* nonce = (uint64_t*)&sequence[56];
     uint8_t hash[32];
 
-    SHA256 mySHA256;
+    SHA256 hasher;
     
-    while(true){
-        mySHA256.computeHash(hash, sequence, 64);
+    while(true)
+    {
+        //assign new key
+        newKey_mutex.lock();
+        *key = newKey;
+        newKey_mutex.unlock();
+
+        hasher.computeHash(hash, sequence, 64);
 
         if(hash[0]==0 && hash[1]==0)
         {
-            //putMessage(*nonce);
+            putMessage(BITCOIN_NONCE, (uint8_t)*nonce);
         }
 
         *nonce += 1;

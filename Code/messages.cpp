@@ -5,6 +5,8 @@ Mail<uint8_t, 8> inCharQ;
 RawSerial pc(SERIAL_TX, SERIAL_RX);
 
 
+volatile uint64_t newKey;
+
 //#######################################################################
 //------------------------ Output Functions------------------------------
 //#######################################################################
@@ -17,12 +19,24 @@ void outputToTerminal (void) {
         if (evt.status == osEventMail) 
         {
             mail_t *mail = (mail_t*)evt.value.p;
-            if(mail->printValue != NULL)
-                pc.printf("\nNounce Found: %f \n"   , mail->printValue);
 
-            if(mail->message != "")
-                pc.printf("\nNounce Found: %s \n"   , mail->message.c_str());
-            
+            switch(mail->type)
+            {
+                case(PRINT_MESSAGE):
+                    pc.printf("\n\r %s\r\n ", mail->message.c_str());
+                    break;
+                case(BITCOIN_NONCE):
+                    pc.printf("\n\r Successful Nonce: %u\r\n ", mail->number);
+                    break;
+                case(UPDATED_KEY):
+                    pc.printf("\n\r New Key: %u\r\n ", mail->number);
+                    break;
+                case(MOTOR_STATUS):
+                    pc.printf("\n\r Target Velocity: %f\n ", mail->dFloat);
+                    pc.printf("\r Actual Velocity: %f\n ", mail->dFloat1);
+                    break;
+            }
+
             mail_box.free(mail);
         }
 
@@ -30,20 +44,38 @@ void outputToTerminal (void) {
     }
 }
 
-void putMessage(double counter)
+void putMessage(int type, uint8_t number)
 {
    mail_t *mail = mail_box.alloc();
-   mail->printValue = counter;
+   mail->type = type;
+   mail->number = number;
    mail_box.put(mail);
 }
 
-void putMessage(std::string message)
+void putMessage(int type, double number)
+{
+   mail_t *mail = mail_box.alloc();
+   mail->type = type;
+   mail->dFloat = number;
+   mail_box.put(mail);
+}
+
+void putMessage(int type, std::string message)
 {
     mail_t *mail = mail_box.alloc();
+    mail->type = type;
     mail->message = message;
     mail_box.put(mail);
 }
 
+void putMessage(int type, double targetVel, double actualVel)
+{
+    mail_t *mail = mail_box.alloc();
+    mail->type = type;
+    mail->dFloat = targetVel;
+    mail->dFloat1 = actualVel;
+    mail_box.put(mail);
+}
 
 //#######################################################################
 //------------------------- Input Functions------------------------------
@@ -67,7 +99,7 @@ void decodeSpeedCommand(std::string input)
         maxSpeed_mutex.lock();
         maxSpeed = (speed*6);//convert input to segments per second
         maxSpeed_mutex.unlock();
-        putMessage("Got Speed Command");
+        putMessage(PRINT_MESSAGE, "Got Speed Command");
     }
 }
 
@@ -82,7 +114,7 @@ void decodePositionCommand(std::string input)
         targetPosition_mutex.lock();
         targetPosition = position + (rotation*6);//convert input to segments
         targetPosition_mutex.unlock();
-        putMessage("Got Position Command");
+        putMessage(PRINT_MESSAGE, "Got Position Command");
     }
 }
 
@@ -93,14 +125,15 @@ void decodeKeyCommand(std::string input)
         char firstChar;
         uint64_t key;
         sscanf(input.c_str(), "%c %llx", &firstChar, &key); //llx formatter since uint64 is unsigned long long 
-        pc.printf("New Key: %llx\n\r", key);
+        //pc.printf("New Key: %llx\n\r", key);
         newKey_mutex.lock();
         newKey = key;
         newKey_mutex.unlock();
-        putMessage("Got Key Command");
+        putMessage(PRINT_MESSAGE, "Got Key Command");
     }
 }
 
+/*
 void decodeTuneCommand(std::string input)
 {
     if(input[0] == 'T') 
@@ -138,15 +171,15 @@ void decodeTuneCommand(std::string input)
         tonesQ_mutex.unlock();
     }
 }
-
-void decodeinput_thread () {
+*/
+void decodeInputThread () {
 
     pc.attach(&serialISR);
     std::string command;
     
     //initilise varibles to default start values
-    maxSpeed = 600;
-    targetPosition = 0;
+    //maxSpeed = 600;
+    //targetPosition = 0;
 
     while (true) 
     {
@@ -162,8 +195,8 @@ void decodeinput_thread () {
             decodeSpeedCommand(command);
             decodePositionCommand(command);
             decodeKeyCommand(command);
-            decodeTuneCommand(command);
-            putMessage("Got Something");
+            //decodeTuneCommand(command);
+            putMessage(PRINT_MESSAGE, "Got Message: " + command);
             command = ""; //Reset input
         } 
     }

@@ -3,8 +3,6 @@
 
 #include "mbed.h"
 #include "messages.h"
-#include "decode.h"
-
 
 //Photointerrupter input pins
 #define I1pin D3
@@ -43,6 +41,14 @@ extern int8_t orState;
 extern int64_t position;
 extern int64_t positionOld;
 extern int8_t direction;
+
+extern float maxSpeed;
+extern double targetPosition;
+
+extern Mutex maxSpeed_mutex;
+extern Mutex motorPower_mutex;
+extern Mutex targetPosition_mutex;
+
 
 //Main thread to instantiate
 void motorCtrlFn();

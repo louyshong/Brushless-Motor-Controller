@@ -13,6 +13,7 @@ Thread MessengerThread;
 Thread TerminaListenerThread;
 Thread BitcoinThread;
 Thread motorCtrlT(osPriorityHigh, 1024);
+//Thread motorCtrlT;
 //Thread TuneThread(osPriorityHigh, 1024);
 
 //########################################################
@@ -22,7 +23,7 @@ int main()
 {
     //start threads
     MessengerThread.start(callback(outputToTerminal));
-    TerminaListenerThread.start(callback(listenToTerminal));
+    TerminaListenerThread.start(callback(decodeInputThread));
     BitcoinThread.start(callback(computeHash));
     motorCtrlT.start(callback(motorCtrlFn));
     //TuneThread.start(callback(playTune_thread));

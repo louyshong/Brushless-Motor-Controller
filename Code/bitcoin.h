@@ -3,9 +3,11 @@
 
 #include "mbed.h"
 #include "SHA256.h"
-#include "decode.h"
 
 void computeHash();
+
+extern Mutex newKey_mutex;
+extern volatile uint64_t newKey;
 
 
 #endif
