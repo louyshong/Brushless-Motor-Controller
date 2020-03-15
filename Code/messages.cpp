@@ -140,7 +140,7 @@ void decodeKeyCommand(std::string input)
     }
 }
 
-/*
+
 void decodeTuneCommand(std::string input)
 {
     if(input[0] == 'T') 
@@ -178,7 +178,7 @@ void decodeTuneCommand(std::string input)
         tonesQ_mutex.unlock();
     }
 }
-*/
+
 void decodeInputThread () {
 
     pc.attach(&serialISR);
@@ -202,7 +202,7 @@ void decodeInputThread () {
             decodeSpeedCommand(command);
             decodePositionCommand(command);
             decodeKeyCommand(command);
-            //decodeTuneCommand(command);
+            decodeTuneCommand(command);
             putMessage(PRINT_MESSAGE, "Got Message: " + command);
             command = ""; //Reset input
         } 

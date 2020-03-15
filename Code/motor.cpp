@@ -57,7 +57,7 @@ float MAX_PWM = 1.0;
 //##########################################################################
 
 int8_t intState = 0;
-int8_t intStateOld = 0;
+int8_t intStateOld = -1;// set to -1 to get the motor moving
 int8_t orState = 0;
 int64_t position = 0;
 int64_t positionOld = 0;
@@ -72,13 +72,13 @@ double targetPosition = 0;
 // velocity error
 float acc_v_error = 0.0;
 float MAX_V_ERROR = 880;
-float Kps = 0.014;  //scales error
+float Kps = 0.023;  //scales error
 float Kis = 0.0007; //dampens error
 float VE = 0.0;
 
 //distance error
-float Kpr = 0.1;    //scales error
-float Kdr = 0.09;   //dampens error
+float Kpr = 0.017;    //scales error
+float Kdr = 0.015;   //dampens error
 float DE = 0.0;
 
 //##########################################################################
@@ -127,7 +127,6 @@ int8_t motorHome() {
     //Get the rotor state
     return readRotorState();
 }
-
 
 
 //------------------------- Control/Update Functions ------------------------
@@ -236,6 +235,7 @@ void motorCtrlFn()
     //start the motor
     InitialiseMotor(); 
 
+    //start the ticker to execute the while loop once every 100ms
     Ticker motorCtrlTicker;
     motorCtrlTicker.attach_us(&motorCtrlTick, 100000);
 
@@ -252,33 +252,36 @@ void motorCtrlFn()
         //calculate velocity
         double velocity = (position - positionOld) * (1 / (double)velocityTimer.read()); //calculating time taken for each revolution (this seems wrong, need to ask about it) 
 
-        //find velocity error
-        VE = VelocityError(abs(velocity));
-
         //find distance error
         DE = DistanceError((double)velocityTimer.read());
 
+        //find velocity error
+        VE = VelocityError(abs(velocity));
+
         //choose error to pass to motor
+        float power_test = 0;
         if (velocity >= 0)
-            motorPower = std::min(VE,DE);
+            power_test = std::min(VE,DE);
         else
-            motorPower = std::max(VE,DE);
+            power_test = std::max(VE,DE);
     
 
         //print velocity
         if(printTimer.read() > 3.0)
         {
-            putMessage(MOTOR_ROTATIONS, (double)targetPosition, (double)position, DE);
-            putMessage(MOTOR_VELOCITY, (double)maxSpeed, (double)velocity, VE);
+            putMessage(MOTOR_ROTATIONS, (double)targetPosition/6, (double)position/6, DE);
+            putMessage(MOTOR_VELOCITY, (double)maxSpeed/6, (double)velocity/6, VE);
             printTimer.reset();
         }
         
+        //update/reset variables
+        lead = (DE >= 0) ? 2 : -2;
+        lead = (VE < 0) ? -lead : lead; // torque in oppositve direction to slow the motor down
 
         //update/reset variables
-        lead = (DE >= 0) ?  2 : -2;
         positionOld = position;
         velocityTimer.reset();
-        UpdateMotorPower(motorPower);
+        UpdateMotorPower(power_test);
     }
 }
 

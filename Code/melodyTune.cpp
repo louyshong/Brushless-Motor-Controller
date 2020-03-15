@@ -1,6 +1,7 @@
-#include "tune.h"
+#include "melodyTune.h"
 
-
+Mutex tonesQ_mutex;
+std::queue<std::string> tonesQ;
 int32_t tunepwm;
 
 void playTune_thread () {

@@ -5,6 +5,7 @@
 #include "string"
 #include "motor.h"
 #include "bitcoin.h"
+#include "melodyTune.h"
 #include "queue"
 #include <regex>
 #include "map"
@@ -12,7 +13,8 @@
 #define PRINT_MESSAGE 0
 #define BITCOIN_NONCE 1
 #define UPDATED_KEY 2
-#define MOTOR_STATUS 3
+#define MOTOR_VELOCITY 3
+#define MOTOR_ROTATIONS 4
 
 extern RawSerial pc;
 
