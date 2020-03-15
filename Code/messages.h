@@ -21,6 +21,7 @@ typedef struct {
   uint8_t    number;
   float    dFloat;
   float    dFloat1;
+  float    dFloat2;
   std::string message;
 } mail_t;
 
@@ -32,7 +33,7 @@ void decodeInputThread();
 extern void putMessage(int type, uint8_t number);
 extern void putMessage(int type, double number);
 extern void putMessage(int type, std::string message);
-extern void putMessage(int type, double targetVel, double actualVel);
+extern void putMessage(int type, double target, double actual, double controllerOutput);
 
 // Variables that are updates by the decoder and accessible to the rest of the system
 //uint64_t newKey;  

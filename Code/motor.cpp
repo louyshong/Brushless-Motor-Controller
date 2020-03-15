@@ -50,6 +50,8 @@ Mutex maxSpeed_mutex;
 Mutex motorPower_mutex;
 Mutex targetPosition_mutex;
 
+float MAX_PWM = 1.0;
+
 //##########################################################################
 //------------------------------- VARIABLES --------------------------------
 //##########################################################################
@@ -60,13 +62,24 @@ int8_t orState = 0;
 int64_t position = 0;
 int64_t positionOld = 0;
 int8_t direction = 0;
-double motorPower = 0; //controller output
+float motorPower = 0; //controller output
 
+// -------- Values from terminal input --------
 float maxSpeed = 600; //set initial max speed to 100 rotations (600 segments) /s
 double targetPosition = 0;
 
-int32_t PWM_PRD = 2500;
+//------------- Control Variables ------------
+// velocity error
+float acc_v_error = 0.0;
+float MAX_V_ERROR = 880;
+float Kps = 0.014;
+float Kis = 0.0007;
+float VE = 0.0;
 
+//distance error
+float Kpr = 0.1;
+float Kdr = 0.09;
+float DE = 0.0;
 
 //##########################################################################
 //------------------------------- FUNCTIONS --------------------------------
@@ -115,23 +128,6 @@ int8_t motorHome() {
     return readRotorState();
 }
 
-void InitialiseMotor() 
-{  
-    MotorPWM.period_us(PWM_PRD);
-    MotorPWM.pulsewidth_us(PWM_PRD);
-    
-    //Run the motor synchronisation
-    orState = motorHome();
-    pc.printf("Rotor origin: %x\n\r",orState);
-    //orState is subtracted from future rotor state inputs to align rotor and motor states
-
-    I1.rise(&UpdateMotorPosition);
-    I1.fall(&UpdateMotorPosition);
-    I2.rise(&UpdateMotorPosition);
-    I2.fall(&UpdateMotorPosition);
-    I3.rise(&UpdateMotorPosition);
-    I3.fall(&UpdateMotorPosition);
-}
 
 
 //------------------------- Control/Update Functions ------------------------
@@ -169,27 +165,67 @@ void motorCtrlTick()
 }
 
 // set the motor power
-void UpdateMotorPower()
+void UpdateMotorPower(float power)
 {
-    float controllerOutput;
+    power = abs(power);
+    if(power > 1.0) power = 1.0;
 
-        //read motor power
-        motorPower_mutex.lock();
-        controllerOutput = motorPower;
-        motorPower_mutex.unlock();
-
-        //setting limit for pulse width of PWM
-        if (abs(controllerOutput) > PWM_PRD) 
-            MotorPWM.pulsewidth_us(PWM_PRD);
-        else 
-            MotorPWM.pulsewidth_us(abs(controllerOutput));
-        
-
+    MotorPWM.write(power);
         //lead = 2 * ((controllerOutput > 0) - (controllerOutput < 0)); //lead set to 2*sgn(y_s)
 
-        lead = (controllerOutput > 0) ? 2 : -2;
+        //lead = (controllerOutput > 0) ? 2 : -2;
 }
 
+void InitialiseMotor() 
+{  
+    MotorPWM.period_us(2500);
+    MotorPWM.write(MAX_PWM);
+    
+    //Run the motor synchronisation
+    orState = motorHome();
+    pc.printf("Rotor origin: %x\n\r",orState);
+    //orState is subtracted from future rotor state inputs to align rotor and motor states
+
+    I1.rise(&UpdateMotorPosition);
+    I1.fall(&UpdateMotorPosition);
+    I2.rise(&UpdateMotorPosition);
+    I2.fall(&UpdateMotorPosition);
+    I3.rise(&UpdateMotorPosition);
+    I3.fall(&UpdateMotorPosition);
+}
+
+float VelocityError(double currentVelocity)
+{
+    //update error term
+    targetPosition_mutex.lock();
+    maxSpeed_mutex.lock();
+    float vError = (maxSpeed - currentVelocity);
+    maxSpeed_mutex.unlock();
+    targetPosition_mutex.unlock();
+
+    //update integral error
+    acc_v_error += vError * 10;
+    if(acc_v_error > MAX_V_ERROR) acc_v_error = MAX_V_ERROR;
+    if(acc_v_error < -MAX_V_ERROR) acc_v_error = -MAX_V_ERROR;
+
+    //return error due to velocity delta
+    return Kps*vError + Kis*acc_v_error;
+}
+
+float DistanceError(double timePassed)
+{
+    // get current and previous distacne error
+    targetPosition_mutex.lock();
+    maxSpeed_mutex.lock();
+
+    double posError = targetPosition - position;
+    double posErrorOld = targetPosition - positionOld;
+
+    maxSpeed_mutex.unlock();
+    targetPosition_mutex.unlock();
+
+    return (Kpr*posError) + (Kdr*(posError - posErrorOld)/(timePassed));
+}
 
 //##########################################################################
 //-------------------------------- THREAD ----------------------------------
@@ -216,19 +252,32 @@ void motorCtrlFn()
         //calculate velocity
         double velocity = (position - positionOld) * (1 / (double)velocityTimer.read()); //calculating time taken for each revolution (this seems wrong, need to ask about it) 
 
-        velocityTimer.reset();
+        //find velocity error
+        VE = VelocityError(velocity);
 
-        float y_s = 25*(maxSpeed - velocity);
+        //find distance error
+        DE = DistanceError((double)velocityTimer.read());
+
+        //choose error to pass to motor
+        if (velocity >= 0)
+            motorPower = std::min(VE,DE);
+        else
+            motorPower = std::max(VE,DE);
+    
 
         //print velocity
-        if(printTimer.read() > 2.5)
+        if(printTimer.read() > 1.0)
         {
-            putMessage(MOTOR_STATUS, maxSpeed, (float)velocity);
+            putMessage(MOTOR_STATUS, (double)targetPosition, (double)position, DE);
             printTimer.reset();
         }
         
 
-        UpdateMotorPower();
+        //update/reset variables
+        lead = (DE >= 0) ?  2 : -2;
+        positionOld = position;
+        velocityTimer.reset();
+        UpdateMotorPower(DE);
     }
 }
 

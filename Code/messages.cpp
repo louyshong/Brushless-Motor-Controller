@@ -32,8 +32,9 @@ void outputToTerminal (void) {
                     pc.printf("\n\r New Key: %u\r\n ", mail->number);
                     break;
                 case(MOTOR_STATUS):
-                    pc.printf("\n\r Target Velocity: %f\n ", mail->dFloat);
-                    pc.printf("\r Actual Velocity: %f\n ", mail->dFloat1);
+                    pc.printf("\n\r Target Pos: %f\n ", mail->dFloat);
+                    pc.printf("\r Actual Pos: %f\n ", mail->dFloat1);
+                    pc.printf("\r Motor Power: %f\n ", mail->dFloat2);
                     break;
             }
 
@@ -68,12 +69,13 @@ void putMessage(int type, std::string message)
     mail_box.put(mail);
 }
 
-void putMessage(int type, double targetVel, double actualVel)
+void putMessage(int type, double target, double actual, double controllerOutput)
 {
     mail_t *mail = mail_box.alloc();
     mail->type = type;
-    mail->dFloat = targetVel;
-    mail->dFloat1 = actualVel;
+    mail->dFloat = target;
+    mail->dFloat1 = actual;
+    mail->dFloat2 = controllerOutput;
     mail_box.put(mail);
 }
 
