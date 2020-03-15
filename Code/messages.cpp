@@ -31,10 +31,15 @@ void outputToTerminal (void) {
                 case(UPDATED_KEY):
                     pc.printf("\n\r New Key: %u\r\n ", mail->number);
                     break;
-                case(MOTOR_STATUS):
-                    pc.printf("\n\r Target Pos: %f\n ", mail->dFloat);
-                    pc.printf("\r Actual Pos: %f\n ", mail->dFloat1);
+                case(MOTOR_VELOCITY):
+                    pc.printf("\n\r Target Vel: %f\n ", mail->dFloat);
+                    pc.printf("\r Actual Vel: %f\n ", mail->dFloat1);
                     pc.printf("\r Motor Power: %f\n ", mail->dFloat2);
+                    break;
+                case(MOTOR_ROTATIONS):
+                    pc.printf("\r Target Pos: %f\n ", mail->dFloat);
+                    pc.printf("\r Actual Pos: %f\n ", mail->dFloat1);
+                    pc.printf("\r Motor Power: %f\n\n ", mail->dFloat2);
                     break;
             }
 

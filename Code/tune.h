@@ -3,7 +3,7 @@
 
 #include "mbed.h"
 #include "motor.h"
-#include "decode.h"
+#include "messages.h"
 
 void playTune_thread();
 

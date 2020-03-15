@@ -72,13 +72,13 @@ double targetPosition = 0;
 // velocity error
 float acc_v_error = 0.0;
 float MAX_V_ERROR = 880;
-float Kps = 0.014;
-float Kis = 0.0007;
+float Kps = 0.014;  //scales error
+float Kis = 0.0007; //dampens error
 float VE = 0.0;
 
 //distance error
-float Kpr = 0.1;
-float Kdr = 0.09;
+float Kpr = 0.1;    //scales error
+float Kdr = 0.09;   //dampens error
 float DE = 0.0;
 
 //##########################################################################
@@ -253,7 +253,7 @@ void motorCtrlFn()
         double velocity = (position - positionOld) * (1 / (double)velocityTimer.read()); //calculating time taken for each revolution (this seems wrong, need to ask about it) 
 
         //find velocity error
-        VE = VelocityError(velocity);
+        VE = VelocityError(abs(velocity));
 
         //find distance error
         DE = DistanceError((double)velocityTimer.read());
@@ -266,9 +266,10 @@ void motorCtrlFn()
     
 
         //print velocity
-        if(printTimer.read() > 1.0)
+        if(printTimer.read() > 3.0)
         {
-            putMessage(MOTOR_STATUS, (double)targetPosition, (double)position, DE);
+            putMessage(MOTOR_ROTATIONS, (double)targetPosition, (double)position, DE);
+            putMessage(MOTOR_VELOCITY, (double)maxSpeed, (double)velocity, VE);
             printTimer.reset();
         }
         
@@ -277,7 +278,7 @@ void motorCtrlFn()
         lead = (DE >= 0) ?  2 : -2;
         positionOld = position;
         velocityTimer.reset();
-        UpdateMotorPower(DE);
+        UpdateMotorPower(motorPower);
     }
 }
 
