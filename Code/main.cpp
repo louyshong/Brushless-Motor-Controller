@@ -11,7 +11,7 @@
 //########################################################
 Thread MessengerThread;
 Thread TerminaListenerThread;
-Thread BitcoinThread;
+Thread BitcoinThread(osPriorityLow, 1024);
 Thread motorCtrlT(osPriorityHigh, 1024);
 //Thread motorCtrlT;
 Thread TuneThread;
