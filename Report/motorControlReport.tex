@@ -18,7 +18,33 @@
 \usepackage{color} % Colour support
 \usepackage{wrapfig} % Text flowing around figures
 \usepackage{lipsum} % Generates meaningless text
+\usepackage{listings}
+\usepackage{xcolor}
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\ttfamily\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+ 
+\lstset{style=mystyle}
 \graphicspath{ {Images/} } % Folder for images 
 
 %~~~~~~~~~ Multi-column setup
@@ -31,14 +57,14 @@
 %~~~~~~~~~ Page setup
 \pagestyle{fancy}
 \fancyhf{}
-\lhead{Sajid-Lulwa-Louys}
-\lfoot{Brushless Motor Control}
+\lhead{Sajid-Lulwa-Tuck}
+\lfoot{Brushless Motor Controller}
 \rhead{March 2020}
 \rfoot{Page \thepage}
 \renewcommand{\footrulewidth}{0.4pt}
 
 %~~~~~~~~~ Title
-\title{Brushless Motor Control}
+\title{Brushless Motor Controller}
 \author{Sajid Lulwa Louys}
 \date{\today}
 
@@ -54,7 +80,7 @@
             
         \vspace{0.5cm}
         \LARGE
-        \textbf{Brushless Motor Control}
+        \textbf{Brushless Motor Controller}
             
         \vspace{1.5cm}
             
@@ -62,7 +88,7 @@
             
         \vfill
             
-        Report on findings\\
+        Coursework 2 Report\\
        
             
         \vspace{0.8cm}
@@ -71,7 +97,7 @@
         \Large
         \textbf{Team Members:}\\
         Sajid Ali\\
-        Louys Hong \\
+        Tuck Hong 01336059\\
         Lulwa Alkhalifa \\
             
     \end{center}
@@ -81,6 +107,7 @@
 \pagenumbering{gobble} % keep title page without a number
 %\maketitle
 \tableofcontents
+\thispagestyle{empty} % remove page numbering for contents page
 \clearpage
 
 \pagenumbering{arabic} % start page numbers again
@@ -88,7 +115,7 @@
 
 \section{Introduction}
 \subsection{Brief}
-\noindent In this report is summarised the implementation of a brushless motor controller which performs additional lower priority tasks in an embedded system.
+In this report is summarised the implementation of a brushless motor controller which performs additional lower priority tasks in an embedded system.
 
 \subsection{Specification}
 \noindent The system was designed to meet the following design criteria:
@@ -96,7 +123,7 @@
 	\item Motor will spin for defined number of rotations and stop without overshooting with a precision of \underline{0.5 rotations per number of rotations}.
 	\item Motor will spin at a defined maximum angular velocity \underline{5-100 rotations per second}, with a precision of \underline{0.5 rotations per second}.
 	\item Perform Bitcoin mining task and test \underline{5000 nonces per second}. Matching nonces will be sent back to the host.
-	\item Motor will play a melody while its spinning. The melody is a repeating sequence of notes in C4 octave with durations \underline{0.125-1 seconds}.
+	\item Motor will play a melody while it is spinning. The melody is a repeating sequence of notes in C4 octave with durations of \underline{0.125-1 seconds}.
 \end{itemize}
 
 \paragraph{This is a paragraph}
@@ -116,20 +143,66 @@
 \subsection{Position Control}
 
 
-\section{Motor Melody Implementation}
-
-
 
 \section{Tasks and Dependencies}
 \subsection{Motor Control}
 
 \subsection{Melody}
 
+By modulating the PWM period and hence the drive current, the motor effectively behaves like a tune generator. A separate thread \textbf{TuneThread} is responsible for changing the PWM period based on the notes present in melody commands given by the user. The notes that are allowed belong to the C4 octave, in other words, frequencies 261.63 Hz (C4) up to 493.88 Hz (B4).   
+
+\bigskip
+
+First, a map containing all the allowed notes and their corresponding PWM periods is initialised. Note that the PWM periods (in $\mu$s) are calculated using $\frac{1000000}{frequency}$. 
+
+\bigskip
+
+\lstinputlisting[language=C++]{melody1.cpp}
+
+\bigskip
+
+In an infinite loop, the thread repeats the following steps where \textbf{tonesQ} is a queue containing the notes and durations that need to be played. 
+
+\bigskip
+
+\lstinputlisting[language=C++]{melody2.cpp}
+
+\bigskip
+
+Since \textbf{tonesQ} is a shared data structure also accessed by \textbf{TerminalListenerThread}, the popping and pushing actions are protected with a mutex. Note that after popping a tone from \textbf{tonesQ} the same tone is immediately pushed back, as the specification requires the motor to play a given melody on loop. 
+
+\bigskip
+
+Following the regex for melody commands where the last entry in the command is an integer corresponding to the duration of the note (number of eighths of a second), the exact duration in milliseconds is obtained in line 8. Note that \textbf{(int)'0'} represents the offset value for numerical ASCII characters such that when subtracted from \textbf{(int)duration}, duration (which is a \textbf{char}) is effectively ``converted" into an \textbf{int}. 
+
+\bigskip
+
+After setting the new PWM period using \textbf{tone} and \textbf{tonefreqmap} initialised previously, the thread is then put to sleep using \textbf{ThisThread::sleep\_for(interval)} so that a given note will last for the specified amount of time before the loop continues with the next note to be played. This solves the issue of blocking other threads from running (e.g. the bitcoin thread which will result in the thread failing to meet 5000 nonces per second) when \textbf{wait} is used instead.   
+
+\bigskip
+
+This task is dependent on a non-empty \textbf{tonesQ}. This dependency is released by \textbf{TerminalListenerThread} when a melody command is received from the user. 
+
 \subsection{Decoding Messages}
 
 \subsection{Outputting Messages}
 
-\subsection{SHA-256 Hashing}
+\subsection{Bitcoin Mining}
+
+The bitcoin mining task is implemented in \textbf{BitcoinThread} as a low priority thread. The task is to look for matching nonces such that when combined with a key provided by the user and the 48 bytes of constant payload, will produce a SHA-256 hash that begins with 16 zeros. This is done by simply initialising the nonce to 0 and incrementing by one on each attempt. 
+
+\bigskip
+
+In order to regulate the mining task so that it satisfies the throughput specification of exactly 5000 nonces per second, the \textbf{Ticker} class is used to set up a timer interrupt that sends a signal to \textbf{BitcoinThread} every second. Every time the thread is released by the signal (which happens once per second), 5000 nonces are tested. The specification also requires the thread to send matching nonces back to the host. This is done by putting a \textbf{Mail} message pointer of type \textbf{BITCOIN\_NONCE} in the \textbf{mail\_box} queue. 
+
+\bigskip
+
+\lstinputlisting[language=C++]{bitcoin1.cpp}
+
+\bigskip
+
+A dependency this task has is the semaphore-like signal from the timer interrupt. This dependency is released once per second (by the timer interrupt). Note that a mutex is used here as \textbf{newKey} is a shared variable that is also accessed by \textbf{TerminalListenerThread} when a new bitcoin key is set by the user. 
+
 
 \subsection{Dependency Graph}
 
@@ -149,7 +222,8 @@ ISR & 0 & 0 & 0 \\           % table contents
 Output & 0 & 0 & 0 \\                         
 Motor Control & 0 & 0  & 0 \\
 Decode & 0 & 0 & 0 \\
-BitCoin Mining & 0 & 0 & 0 \\ [1ex]     % [1ex] adds vertical space
+BitCoin Mining & 1s & 0 & 0 \\
+Melody & 0.125s & 0 & 0\\[1ex]     % [1ex] adds vertical space
 \end{tabular}
 \caption{Task timing and resource utilization.} 
 \label{table:nonlin}            % is used to refer this table in the text
