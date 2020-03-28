@@ -211,7 +211,10 @@ The method used detemine if the command message is valid varies for the differen
 \bigskip
 \lstinputlisting[language=C++]{decode2.cpp}  
 \bigskip
-If the message received from the serial port matches any of the expected commands, then the relevant changes are made to implement the command and a \textbf{Mail} message to confirm receiving a command is put into a \textbf{mail\_box} and communicated to the host via serial. More information about this can be found in the next section.
+If the message received from the serial port matches any of the expected commands, then the relevant changes are made to implement the command and a \textbf{Mail} message to confirm receiving a command is put into a \textbf{mail\_box} and communicated to the host via serial. 
+\bigskip
+
+In \textbf{decodeSpeedCommand}, for example, the new maximum speed is written into a global variable \textbf{maxSpeed} where it will be read by the motor control thread. This variable is protected by a mutex \textbf{maxSpeed\_mutex} to prevent simultaneous access.
 
 
 \subsection{Outputting Messages}
