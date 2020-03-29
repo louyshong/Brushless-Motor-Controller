@@ -126,11 +126,6 @@ In this report is summarised the implementation of a brushless motor controller 
 	\item Motor will play a melody while it is spinning. The melody is a repeating sequence of notes in C4 octave with durations of \underline{0.125-1 seconds}.
 \end{itemize}
 
-\paragraph{This is a paragraph}
-\lipsum[2]
-
-\subparagraph{And this is a subparagraph}
-\lipsum[3]
 
 
 
@@ -142,10 +137,12 @@ I'm guessing this has probably changed since yesterday. I'm so sorry about that 
 
 \subsection{Velocity Control}
 
+\noindent
 Velocity was controlled using a proportional and integral term in the control equation.
 
 \[ y_s = \left( k_p(s-v)+ k_i\int(s-v)dt\right)\textrm{sgn}(E_r)\]
 
+\noindent
 \(y_s\) is the speed controller output which is compared with the position controller output to determine the motor PWM. \(k_p\)and \(k_i\) are the tuning parameters, \(s\) is the maximum speed (set by the host and initialised at 100 rotations per second upon startup) , \(E_r\) is the position error, and \(v\) is the measured velocity. The integral term is implemented as follows:
 
 \bigskip
@@ -155,6 +152,7 @@ Velocity was controlled using a proportional and integral term in the control eq
 
 \bigskip
 
+\noindent
 Further processing is done to convert the controller output into a PWM duty cycle. The absolute value of \(y_s\) is considered and the value of lead is modified to take the direction of rotation into account.
 
 \bigskip
@@ -163,6 +161,7 @@ Further processing is done to convert the controller output into a PWM duty cycl
 
 \bigskip
 
+\noindent
 Also a limit is applied so that the PWM duty cycle (\textbf{power}) does not exceed the maximum value of 1
 
 \bigskip
@@ -173,6 +172,7 @@ Also a limit is applied so that the PWM duty cycle (\textbf{power}) does not exc
 
 \subsection{Position Control}
 
+\noindent
 For position control both a proportional and differential term are used.
 
 \[y_r = k_pE_r + k_d \frac{dE_r}{dt}\]
@@ -183,27 +183,32 @@ For position control both a proportional and differential term are used.
 \lstinputlisting[language=C++]{position1.cpp}
 \bigskip
 
+\noindent
 Combining velocity and position control is done by choosing the most conservative value and is implemented as follows:
 
 \bigskip
 \lstinputlisting[language=C++]{position2.cpp}
 \bigskip
 
+\noindent
 A non-linearity is applied the distance error term to prevent oscillations at lower speeds.
 
 \section{Tasks and Dependencies}
 \subsection{Motor Control}
 
+\noindent
 Motor control is implemented in a high priority thread \textbf{motorCtrlT}. Within the main function responsible for motor control \textbf{motorCtrlFn}, the interrupt service routine \textbf{UpdateMotorPos} is attached to the photo-interrupter inputs, such that the motor PWM is updated whenever there is a change in any of the inputs.
 
 \bigskip
 
+\noindent
 A ticker object is also created within \textbf{motorCrtlT} and the callback function \textbf{motorCtrlTick()} is attached, such that it runs every 100ms. The purpose of this interrupt is to set a signal using the RTOS function \textbf{Thread::signal\_set()} to \textbf{motorCtrlT}. This ensures that velocity is measured and the control output for power is updated every 100ms.
 
 \bigskip
 \lstinputlisting[language=C++]{motor1.cpp}
 \bigskip
 
+\noindent
 Furthermore, when calculating velocity and distance error, the mutex \textbf{maxSpeed\_mutex }is used to protect the variable \textbf{maxSpeed} and the mutex \textbf{targetPosition\_mutex} is used to protect the variable \textbf{targetPosition} from simulataneous access. This is important because the decode command thread also needs to write to these variables when speed and position commands are received from the host. An example of this is shown below.
 
 \bigskip
@@ -212,10 +217,12 @@ Furthermore, when calculating velocity and distance error, the mutex \textbf{max
 
 \subsection{Melody}
 
+\noindent
 By modulating the PWM period and hence the drive current, the motor effectively behaves like a tune generator. A separate thread \textbf{TuneThread} is responsible for changing the PWM period based on the notes present in melody commands given by the user. The notes that are allowed belong to the C4 octave, in other words, frequencies 261.63 Hz (C4) up to 493.88 Hz (B4).   
 
 \bigskip
 
+\noindent
 First, a map containing all the allowed notes and their corresponding PWM periods is initialised. Note that the PWM periods (in $\mu$s) are calculated using $\frac{1000000}{frequency}$. 
 
 \bigskip
@@ -224,6 +231,7 @@ First, a map containing all the allowed notes and their corresponding PWM period
 
 \bigskip
 
+\noindent
 In an infinite loop, the thread repeats the following steps where \textbf{tonesQ} is a queue containing the notes and durations that need to be played. 
 
 \bigskip
@@ -232,18 +240,22 @@ In an infinite loop, the thread repeats the following steps where \textbf{tonesQ
 
 \bigskip
 
+\noindent
 Since \textbf{tonesQ} is a shared data structure also accessed by \textbf{TerminalListenerThread}, the popping and pushing actions are protected with a mutex. Note that after popping a tone from \textbf{tonesQ} the same tone is immediately pushed back, as the specification requires the motor to play a given melody on loop. 
 
 \bigskip
 
+\noindent
 Following the regex for melody commands where the last entry in the command is an integer corresponding to the duration of the note (number of eighths of a second), the exact duration in milliseconds is obtained in line 8. Note that \textbf{(int)'0'} represents the offset value for numerical ASCII characters such that when subtracted from \textbf{(int)duration}, duration (which is a \textbf{char}) is effectively ``converted" into an \textbf{int}. 
 
 \bigskip
 
+\noindent
 After setting the new PWM period using \textbf{tone} and \textbf{tonefreqmap} initialised previously, the thread is then put to sleep using \textbf{ThisThread::sleep\_for(interval)} so that a given note will last for the specified amount of time before the loop continues with the next note to be played. This solves the issue of blocking other threads from running (e.g. the bitcoin thread which will result in the thread failing to meet 5000 nonces per second) when \textbf{wait} is used instead.   
 
 \bigskip
 
+\noindent
 This task is dependent on a non-empty \textbf{tonesQ}. This dependency is released by \textbf{TerminalListenerThread} when a melody command is received from the user. 
 
 \subsection{Decoding Messages}
@@ -260,15 +272,18 @@ This task is dependent on a non-empty \textbf{tonesQ}. This dependency is releas
 	
 \end{itemize}
 
+\noindent
 An interrupt service routine \textbf{serialISR} receives each incoming byte from the serial port and places it into a queue. This is done by using the method \textbf{uint8\_t RawSerial::getc()} to retrieve a byte from the serial port and the method \textbf{Mail::put()} to put a \textbf{Mail} message in a \textbf{mail\_box} queue.
 \bigskip
 
+\noindent
 Decoding messages is implemented in \textbf{TerminaListenerThread} as a normal priority thread. \textbf{serialISR} is attached to serial port events, and in an infinite loop the method \textbf{Mail::get()} is used to wait for new characters. Upon receiving a return carriage character from mail, the command message is passed to functions that try to match it with the expected syntax. The command message is then placed in another \textbf{mail\_box} to be communicated to the host via serial.
 
 \bigskip
 \lstinputlisting[language=C++]{decode1.cpp}   
 \bigskip       
 
+\noindent
 The method used detemine if the command message is valid varies for the different commands.The standard C++ regular expressions library is used to decode speed and position commands. The function \textbf{sscanf} is used to decode the new key command, and melody commands are decoded by iterating through the message string as shown below.
 
 \bigskip
@@ -284,10 +299,12 @@ In \textbf{decodeSpeedCommand}, for example, the new maximum speed is written in
 
 \subsection{Bitcoin Mining}
 
+\noindent
 The bitcoin mining task is implemented in \textbf{BitcoinThread} as a low priority thread. The task is to look for matching nonces such that when combined with a key provided by the user and the 48 bytes of constant payload, will produce a SHA-256 hash that begins with 16 zeros. This is done by simply initialising the nonce to 0 and incrementing by one on each attempt. 
 
 \bigskip
 
+\noindent
 In order to regulate the mining task so that it satisfies the throughput specification of exactly 5000 nonces per second, the \textbf{Ticker} class is used to set up a timer interrupt that sends a signal to \textbf{BitcoinThread} every second. Every time the thread is released by the signal (which happens once per second), 5000 nonces are tested. The specification also requires the thread to send matching nonces back to the host. This is done by putting a \textbf{Mail} message pointer of type \textbf{BITCOIN\_NONCE} in the \textbf{mail\_box} queue. 
 
 \bigskip
@@ -296,6 +313,7 @@ In order to regulate the mining task so that it satisfies the throughput specifi
 
 \bigskip
 
+\noindent
 A dependency this task has is the semaphore-like signal from the timer interrupt. This dependency is released once per second (by the timer interrupt). Note that a mutex is used here as \textbf{newKey} is a shared variable that is also accessed by \textbf{TerminalListenerThread} when a new bitcoin key is set by the user. 
 
 
@@ -313,7 +331,22 @@ A dependency this task has is the semaphore-like signal from the timer interrupt
 
 \section{Timings and CPU Utilisation}
 \subsection{Methodology}
-To ensure the system would meet the design criteria outlined in the introduction it was crucial that we measure and simulate the worst case performance. 
+
+\noindent
+The CPU usage of each task running in the micro-controller was indirectly observed by pulling one of the digital I/O pins high and low to show when a task was executing. Measuring the time the between pulses and the duration of each pulse would tell us the initiation interval and execution time of each task.
+
+We used a USB oscilloscope to take the measurements. An example of a trace we obtained is shown below.
+
+\begin{figure}[H]
+\begin{center}
+%\fbox{\rule{0pt}{1in} \rule{0.8\linewidth}{0pt}}
+   \includegraphics[width=0.9\linewidth]{ScopeOutput.png}
+\end{center}
+   \caption{Picoscope pulse trigger.}
+\label{fig:long}
+\label{fig:onecol}
+\end{figure}
+
 
 \subsection{Measure Results}
 
@@ -327,7 +360,7 @@ Output & 1.0s & 101ms & 10.11\% \\
 Motor Control & 100ms & 75us  & 0.08\% \\
 Decode & - & 53us & - \\
 BitCoin Mining & 1.0s & 868ms & 86.8\% \\
-Melody & 0.125s & 0.4us & ~0\% \\[1ex]     % [1ex] adds vertical space
+Melody & 0.125s & 1.0us & ~0\% \\[1ex]     % [1ex] adds vertical space
 \end{tabular}
 \caption{Task timing and resource utilization.} 
 \label{table:nonlin}            % is used to refer this table in the text
@@ -336,67 +369,42 @@ Melody & 0.125s & 0.4us & ~0\% \\[1ex]     % [1ex] adds vertical space
 
 \subsection{Critical Instant Analysis of the Rate Monotonic Scheduler}
 
+\noindent
+By assuming the worst case scenario in terms of resource usage, we can test to see if our design will always meet the specifications.
+To test this we will calculate the CPU time used up by every thread within a single second. If we are able to execute all necessary tasks within this time frame, then we can be confident in our design.
+
+\bigskip
+
+\noindent
+We start by assuming that the motor is running at full speed (i.e. 100 rps) and that we are printing to the terminal every second.
+
+\bigskip
+
+\noindent
+Using the table above, this yields 3.6ms and 0.75ms of CPU time for the motor interrupt and motor control threads respectively.
+The final three threads, printing, bitcoin mining, and playing a melody had fixed times and therefore can be added directly.
+
+\bigskip
+
+\noindent
+The results are summarised in the figure below. As you can see, after all the tasks are done executing there is minimum surplus of 30ms which could be used to decoding messages from the user.
+
+
+\begin{figure}[H]
+\begin{center}
+%\fbox{\rule{0pt}{1in} \rule{0.8\linewidth}{0pt}}
+   \includegraphics[width=0.9\linewidth]{scheduler.png}
+\end{center}
+   \caption{Worst case scenario scheduler.}
+\label{fig:long}
+\label{fig:onecol}
+\end{figure}
 
 
 
 
 
 
-
-
-\section{Highlighting and footnotes}
-You can make words \textbf{bold}, \textit{italicise} them, \underline{underline words} or \textbf{make them \emph{stand out} regardless of the surrounding}. You can break a line\\ mid sentence and make footnotes like this \footnote{a footnote}.
-
-\section{Equations}
-
-% Forgot a symbol? See the LaTeX symbol wiki https://en.wikipedia.org/wiki/Wikipedia:LaTeX_symbols
-
-\subsection{As part of text}
-
-In total 85 distinct galaxies were identified in the Hubble Deep Field image provided, the list of which can be found in Appendix B at the end of this report. Poisson statistics states that the error in the number of galaxies counted ($N_x$) is simply the root of the count ($\sqrt{N_x}$), this can be represented as a percentage by the following equation, $N_x^2 + N^2$.
-
-\subsection{In the middle, not numbered} 
-
-$$ \alpha \beta \times \frac{2G}{x^2B_n}$$
-
-$$ \frac{-b \pm \sqrt{b^2-4ac}}{2a} + \sin{x}$$
-
-% mag = 5 * np.log10(dlpc/10) + M
-$$ \mathrm{mag} = 5 \times \mathrm{log}_{10}\left(\frac{D_{l}}{10}\right) + \mathrm{M_{corr}}$$
-
-\subsubsection{And in the middle, numbered}
-\begin{equation}
-    A=bx+24\times F_x
-    \label{eq:lovely formula}
-\end{equation}
-
-\section{Adding images}
-Hello, here is some text without a meaning.  This text should show what a printed text will look like at this place. If you read this text, you will get no information.  Really?  Is there no information?  Is there.
-
-%\subsection{Lonely image}
-%\begin{figure}[h!]
-%    \centering % keeps the image in the centre
-%    \includegraphics[width=0.5\textwidth]{snailfrog.png}
-%    \caption{A visualisation of a frog.}
-%    \label{fig:frog}
-%\end{figure}
-
-\lipsum[7]
-
-\subsubsection{Images side by side}
-%\begin{figure}[h]
-%    \centering
-%    \begin{minipage}{0.45\textwidth}
-%        \centering
-%        \includegraphics[width=0.9\textwidth]{frog.jpg}
-%        \caption{first figure}
-%    \end{minipage}\hfill
-%    \begin{minipage}{0.45\textwidth}
-%        \centering
-%        \includegraphics[width=0.9\textwidth]{serious_frog.jpeg}
-%        \caption{second figure}
-%    \end{minipage}
-%\end{figure}
 
 \section{Citing and referencing}
 

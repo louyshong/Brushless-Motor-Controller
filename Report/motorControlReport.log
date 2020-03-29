@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7200 64-bit) (preloaded format=pdflatex 2019.11.12)  29 MAR 2020 18:11
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7200 64-bit) (preloaded format=pdflatex 2019.11.12)  29 MAR 2020 19:35
 entering extended mode
 **./motorControlReport.tex
 (motorControlReport.tex
@@ -1144,7 +1144,20 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \float@box=\box95
 \@float@everytoks=\toks40
 \@floatcapt=\box96
-) (motorControlReport.aux)
+) (motorControlReport.aux
+
+LaTeX Warning: Label `fig:long' multiply defined.
+
+
+LaTeX Warning: Label `fig:onecol' multiply defined.
+
+
+LaTeX Warning: Label `fig:long' multiply defined.
+
+
+LaTeX Warning: Label `fig:onecol' multiply defined.
+
+)
 \openout1 = `motorControlReport.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 72.
@@ -1280,111 +1293,129 @@ ty"
 File: lstmisc.sty 2020/03/24 1.8d (Carsten Heinz)
 )
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
-nput line 153.
- (velocity1.cpppdfTeX warning (ext4): destination with the same identifier (nam
-e{page.1}) has been already used, duplicate ignored
+nput line 150.
+ (velocity1.cpp) (velocity2.cpp) (velocity3.cpppdfTeX warning (ext4): destinati
+on with the same identifier (name{page.1}) has been already used, duplicate ign
+ored
 <to be read again> 
                    \relax 
-l.4  
-        if(acc_v_error < -MAX_V_ERROR) acc_v_error = -MAX_V_ERROR; [1
+l.7 }
+      [1
 
-])
-(velocity2.cpp) (velocity3.cpp) (position1.cpp) (position2.cpp) [2] (motor1.cpp
-) (motor2.cpp) (melody1.cpp) [3] (melody2.cpp) (decode1.cpp [4]) (decode2.cpp)
-[5] (bitcoin1.cpp)
-<dependency.png, id=296, 3009.2425pt x 1495.5875pt>
+]) (position1.cpp) (position2.cpp) (motor1.cpp [2]) (motor2.cpp)
+(melody1.cpp) (melody2.cpp) [3] (decode1.cpp) [4] (decode2.cpp) (bitcoin1.cpp
+[5])
+<dependency.png, id=269, 3009.2425pt x 1495.5875pt>
 File: dependency.png Graphic file (type png)
 <use dependency.png>
-Package pdftex.def Info: dependency.png  used on input line 307.
+Package pdftex.def Info: dependency.png  used on input line 325.
 (pdftex.def)             Requested size: 380.26768pt x 188.97902pt.
+<ScopeOutput.png, id=271, 1005.7575pt x 754.31813pt>
+File: ScopeOutput.png Graphic file (type png)
+<use ScopeOutput.png>
+Package pdftex.def Info: ScopeOutput.png  used on input line 343.
+(pdftex.def)             Requested size: 380.26768pt x 285.19362pt.
  [6pdfTeX warning (ext4): destination with the same identifier (name{figure.1})
  has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.348 
+l.349 
        <./dependency.png>] [7pdfTeX warning (ext4): destination with the same i
-dentifier (name{table.1}) has been already used, duplicate ignored
+dentifier (name{figure.2}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.384 
-      ]
+l.391 
+      pdfTeX warning (ext4): destination with the same identifier (name{table.1
+}) has been already used, duplicate ignored
 
-Package hyperref Warning: Difference (2) between bookmark levels is greater 
-(hyperref)                than one, level fixed on input line 385.
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.391 
+       <./ScopeOutput.png>]
+<scheduler.png, id=290, 1424.32124pt x 436.63126pt>
+File: scheduler.png Graphic file (type png)
+<use scheduler.png>
+Package pdftex.def Info: scheduler.png  used on input line 396.
+(pdftex.def)             Requested size: 380.26768pt x 116.57285pt.
+
+
+LaTeX Warning: Reference `eq:lovely formula' on page 8 undefined on input line 
+412.
 
 
 LaTeX Warning: Reference `fig:frog in multicol' on page 8 undefined on input li
-ne 403.
+ne 412.
 
 
 Package natbib Warning: Citation `toadetal1958' on page 8 undefined on input li
-ne 406.
+ne 415.
 
 
 Package natbib Warning: Citation `toadetal1958' on page 8 undefined on input li
-ne 406.
+ne 415.
 
 
 Package natbib Warning: Citation `squeaker1982' on page 8 undefined on input li
-ne 406.
+ne 415.
 
 
 Package natbib Warning: Citation `siddiqi2004interspecific' on page 8 undefined
- on input line 406.
+ on input line 415.
 
 No file motorControlReport.bbl.
 
 Package natbib Warning: There were undefined citations.
 
-[8]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 416.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 416.
+[8pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) 
+has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.425 \end{document}
+                     <./scheduler.png>]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 425.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 425.
  (motorControlReport.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 416.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 416.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 425.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 425.
 Package rerunfilecheck Info: File `motorControlReport.out' has not changed.
-(rerunfilecheck)             Checksum: 0A6711656855229A4998D0B0F5D86743;1840.
+(rerunfilecheck)             Checksum: 005DA90A534F4F1D1C8CC055018C5771;1381.
 
 
 LaTeX Warning: There were undefined references.
 
 
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 416.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 425.
  ) 
 Here is how much of TeX's memory you used:
- 32956 strings out of 492452
- 619388 string characters out of 3120063
- 1101494 words of memory out of 3000000
- 36666 multiletter control sequences out of 15000+200000
- 543134 words of font info for 61 fonts, out of 3000000 for 9000
+ 32925 strings out of 492452
+ 619114 string characters out of 3120063
+ 1117512 words of memory out of 3000000
+ 36656 multiletter control sequences out of 15000+200000
+ 538606 words of font info for 46 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 78i,12n,99p,974b,2143s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 78i,12n,99p,974b,2028s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Users/Sajid/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts
 /cm/cmbx10.pfb><C:/Users/Sajid/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/pu
 blic/amsfonts/cm/cmbx12.pfb><C:/Users/Sajid/AppData/Local/Programs/MiKTeX 2.9/f
-onts/type1/public/amsfonts/cm/cmbxti10.pfb><C:/Users/Sajid/AppData/Local/Progra
-ms/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/Sajid/AppData
-/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/
-Sajid/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi7.pf
-b><C:/Users/Sajid/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts
-/cm/cmr10.pfb><C:/Users/Sajid/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/pub
-lic/amsfonts/cm/cmr12.pfb><C:/Users/Sajid/AppData/Local/Programs/MiKTeX 2.9/fon
-ts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/Sajid/AppData/Local/Programs/Mi
-KTeX 2.9/fonts/type1/public/amsfonts/cm/cmr5.pfb><C:/Users/Sajid/AppData/Local/
-Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr6.pfb><C:/Users/Sajid/App
-Data/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/User
-s/Sajid/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr8.p
-fb><C:/Users/Sajid/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfont
-s/cm/cmsy10.pfb><C:/Users/Sajid/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/p
-ublic/amsfonts/cm/cmti10.pfb><C:/Users/Sajid/AppData/Local/Programs/MiKTeX 2.9/
-fonts/type1/public/amsfonts/cm/cmtt8.pfb>
-Output written on motorControlReport.pdf (10 pages, 383930 bytes).
+onts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/Sajid/AppData/Local/Programs
+/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi10.pfb><C:/Users/Sajid/AppData/L
+ocal/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/Saj
+id/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr10.pfb><
+C:/Users/Sajid/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm
+/cmr12.pfb><C:/Users/Sajid/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public
+/amsfonts/cm/cmr17.pfb><C:/Users/Sajid/AppData/Local/Programs/MiKTeX 2.9/fonts/
+type1/public/amsfonts/cm/cmr5.pfb><C:/Users/Sajid/AppData/Local/Programs/MiKTeX
+ 2.9/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/Sajid/AppData/Local/Prog
+rams/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Sajid/AppDa
+ta/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt8.pfb>
+Output written on motorControlReport.pdf (10 pages, 399418 bytes).
 PDF statistics:
- 422 PDF objects out of 1000 (max. 8388607)
- 166 named destinations out of 1000 (max. 500000)
- 242 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 370 PDF objects out of 1000 (max. 8388607)
+ 157 named destinations out of 1000 (max. 500000)
+ 196 words of extra memory for PDF output out of 10000 (max. 10000000)
 
