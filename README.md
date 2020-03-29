@@ -4,5 +4,3 @@
 - Sajid Ali
 - Lulwa Alkhalifa
 - Tuck Hong
-
-## How to use our controller 
