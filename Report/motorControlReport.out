@@ -5,25 +5,24 @@
 \BOOKMARK [2][-]{subsection.2.1}{Position and Velocity Measurements}{section.2}% 5
 \BOOKMARK [2][-]{subsection.2.2}{Velocity Control}{section.2}% 6
 \BOOKMARK [2][-]{subsection.2.3}{Position Control}{section.2}% 7
-\BOOKMARK [1][-]{section.3}{Motor Melody Implementation}{}% 8
-\BOOKMARK [1][-]{section.4}{Tasks and Dependencies}{}% 9
-\BOOKMARK [2][-]{subsection.4.1}{Motor Control}{section.4}% 10
-\BOOKMARK [2][-]{subsection.4.2}{Melody}{section.4}% 11
-\BOOKMARK [2][-]{subsection.4.3}{Decoding Messages}{section.4}% 12
-\BOOKMARK [2][-]{subsection.4.4}{Outputting Messages}{section.4}% 13
-\BOOKMARK [2][-]{subsection.4.5}{SHA-256 Hashing}{section.4}% 14
-\BOOKMARK [2][-]{subsection.4.6}{Dependency Graph}{section.4}% 15
-\BOOKMARK [1][-]{section.5}{Timings and CPU Utilisation}{}% 16
-\BOOKMARK [2][-]{subsection.5.1}{Methodology}{section.5}% 17
-\BOOKMARK [2][-]{subsection.5.2}{Measure Results}{section.5}% 18
-\BOOKMARK [2][-]{subsection.5.3}{Critical Instant Analysis of the Rate Monotonic Scheduler}{section.5}% 19
-\BOOKMARK [1][-]{section.6}{Highlighting and footnotes}{}% 20
-\BOOKMARK [1][-]{section.7}{Equations}{}% 21
-\BOOKMARK [2][-]{subsection.7.1}{As part of text}{section.7}% 22
-\BOOKMARK [2][-]{subsection.7.2}{In the middle, not numbered}{section.7}% 23
-\BOOKMARK [3][-]{subsubsection.7.2.1}{And in the middle, numbered}{subsection.7.2}% 24
-\BOOKMARK [1][-]{section.8}{Adding images}{}% 25
-\BOOKMARK [2][-]{subsubsection.8.0.1}{Images side by side}{section.8}% 26
-\BOOKMARK [1][-]{section.9}{Citing and referencing}{}% 27
-\BOOKMARK [2][-]{subsection.9.1}{Referencing figures and equations}{section.9}% 28
-\BOOKMARK [2][-]{subsection.9.2}{Citing a paper}{section.9}% 29
+\BOOKMARK [1][-]{section.3}{Tasks and Dependencies}{}% 8
+\BOOKMARK [2][-]{subsection.3.1}{Motor Control}{section.3}% 9
+\BOOKMARK [2][-]{subsection.3.2}{Melody}{section.3}% 10
+\BOOKMARK [2][-]{subsection.3.3}{Decoding Messages}{section.3}% 11
+\BOOKMARK [2][-]{subsection.3.4}{Outputting Messages}{section.3}% 12
+\BOOKMARK [2][-]{subsection.3.5}{Bitcoin Mining}{section.3}% 13
+\BOOKMARK [2][-]{subsection.3.6}{Dependency Graph}{section.3}% 14
+\BOOKMARK [1][-]{section.4}{Timings and CPU Utilisation}{}% 15
+\BOOKMARK [2][-]{subsection.4.1}{Methodology}{section.4}% 16
+\BOOKMARK [2][-]{subsection.4.2}{Measure Results}{section.4}% 17
+\BOOKMARK [2][-]{subsection.4.3}{Critical Instant Analysis of the Rate Monotonic Scheduler}{section.4}% 18
+\BOOKMARK [1][-]{section.5}{Highlighting and footnotes}{}% 19
+\BOOKMARK [1][-]{section.6}{Equations}{}% 20
+\BOOKMARK [2][-]{subsection.6.1}{As part of text}{section.6}% 21
+\BOOKMARK [2][-]{subsection.6.2}{In the middle, not numbered}{section.6}% 22
+\BOOKMARK [3][-]{subsubsection.6.2.1}{And in the middle, numbered}{subsection.6.2}% 23
+\BOOKMARK [1][-]{section.7}{Adding images}{}% 24
+\BOOKMARK [2][-]{subsubsection.7.0.1}{Images side by side}{section.7}% 25
+\BOOKMARK [1][-]{section.8}{Citing and referencing}{}% 26
+\BOOKMARK [2][-]{subsection.8.1}{Referencing figures and equations}{section.8}% 27
+\BOOKMARK [2][-]{subsection.8.2}{Citing a paper}{section.8}% 28

@@ -6,10 +6,9 @@ while (true) {
         newKey_mutex.unlock();
         sha256.computeHash(hash, sequence, 64);
         *nonce +=1;
-    
+
         if(hash[0] == 0 && hash[1] == 0) {
-            uint64_t numbernonce = *nonce;
-            putMessage(numbernonce);
+            putMessage(BITCOIN_NONCE, (uint8_t)*nonce);
         }
     }
 }

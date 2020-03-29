@@ -189,7 +189,7 @@ Combining velocity and position control is done by choosing the most conservativ
 \lstinputlisting[language=C++]{position2.cpp}
 \bigskip
 
-
+A non-linearity is applied the distance error term to prevent oscillations at lower speeds.
 
 \section{Tasks and Dependencies}
 \subsection{Motor Control}
@@ -301,24 +301,33 @@ A dependency this task has is the semaphore-like signal from the timer interrupt
 
 \subsection{Dependency Graph}
 
-
+\begin{figure}[H]
+\begin{center}
+%\fbox{\rule{0pt}{1in} \rule{0.8\linewidth}{0pt}}
+   \includegraphics[width=0.9\linewidth]{dependency.png}
+\end{center}
+   \caption{Dependency flow chart.}
+\label{fig:long}
+\label{fig:onecol}
+\end{figure}
 
 \section{Timings and CPU Utilisation}
 \subsection{Methodology}
 To ensure the system would meet the design criteria outlined in the introduction it was crucial that we measure and simulate the worst case performance. 
 
 \subsection{Measure Results}
+
 \begin{table}[ht]
 \centering                      % used for centering table
 \begin{tabular}{c c c c}        % centered columns (4 columns)
 Task & Initiation Interval (t) & Execution Time (T) & CPU Utilization (U) \\ [0.5ex]   % inserts table %heading
 \hline                          % inserts 1 horizontal line
-ISR & 0 & 0 & 0 \\           % table contents
-Output & 0 & 0 & 0 \\                         
-Motor Control & 0 & 0  & 0 \\
-Decode & 0 & 0 & 0 \\
-BitCoin Mining & 1s & 0 & 0 \\
-Melody & 0.125s & 0 & 0\\[1ex]     % [1ex] adds vertical space
+ISR & 1.28ms & 5.0us & 0.40\% \\           % table contents
+Output & 1.0s & 101ms & 10.11\% \\                         
+Motor Control & 100ms & 75us  & 0.08\% \\
+Decode & - & 53us & - \\
+BitCoin Mining & 1.0s & 868ms & 86.8\% \\
+Melody & 0.125s & 0.4us & ~0\% \\[1ex]     % [1ex] adds vertical space
 \end{tabular}
 \caption{Task timing and resource utilization.} 
 \label{table:nonlin}            % is used to refer this table in the text
