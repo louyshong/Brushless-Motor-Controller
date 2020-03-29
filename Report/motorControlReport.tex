@@ -98,7 +98,7 @@
         \textbf{Team Members:}\\
         Sajid Ali\\
         Tuck Hong 01336059\\
-        Lulwa Alkhalifa \\
+        Lulwa Alkhalifa 01351905 \\
             
     \end{center}
 \end{titlepage}
@@ -138,14 +138,77 @@ In this report is summarised the implementation of a brushless motor controller 
 \section{Motor Control Implementation}
 \subsection{Position and Velocity Measurements}
 
+I'm guessing this has probably changed since yesterday. I'm so sorry about that :(
+
 \subsection{Velocity Control}
 
+Velocity was controlled using a proportional and integral term in the control equation.
+
+\[ y_s = \left( k_p(s-v)+ k_i\int(s-v)dt\right)\textrm{sgn}(E_r)\]
+
+\(y_s\) is the speed controller output which is compared with the position controller output to determine the motor PWM. \(k_p\)and \(k_i\) are the tuning parameters, \(s\) is the maximum speed (set by the host and initialised at 100 rotations per second upon startup) , \(E_r\) is the position error, and \(v\) is the measured velocity. The integral term is implemented as follows:
+
+\bigskip
+
+\lstinputlisting[language=C++]{velocity1.cpp}
+
+
+\bigskip
+
+Further processing is done to convert the controller output into a PWM duty cycle. The absolute value of \(y_s\) is considered and the value of lead is modified to take the direction of rotation into account.
+
+\bigskip
+
+\lstinputlisting[language=C++]{velocity2.cpp}
+
+\bigskip
+
+Also a limit is applied so that the PWM duty cycle (\textbf{power}) does not exceed the maximum value of 1
+
+\bigskip
+
+\lstinputlisting[language=C++]{velocity3.cpp}
+
+\bigskip
+
 \subsection{Position Control}
+
+For position control both a proportional and differential term are used.
+
+\[y_r = k_pE_r + k_d \frac{dE_r}{dt}\]
+
+\(k_p\) and \(k_d\) are the tuning parameters, and \(E_r\) is the position error. This is calculated as shown below:
+
+\bigskip
+\lstinputlisting[language=C++]{position1.cpp}
+\bigskip
+
+Combining velocity and position control is done by choosing the most conservative value and is implemented as follows:
+
+\bigskip
+\lstinputlisting[language=C++]{position2.cpp}
+\bigskip
 
 
 
 \section{Tasks and Dependencies}
 \subsection{Motor Control}
+
+Motor control is implemented in a high priority thread \textbf{motorCtrlT}. Within the main function responsible for motor control \textbf{motorCtrlFn}, the interrupt service routine \textbf{UpdateMotorPos} is attached to the photo-interrupter inputs, such that the motor PWM is updated whenever there is a change in any of the inputs.
+
+\bigskip
+
+A ticker object is also created within \textbf{motorCrtlT} and the callback function \textbf{motorCtrlTick()} is attached, such that it runs every 100ms. The purpose of this interrupt is to set a signal using the RTOS function \textbf{Thread::signal\_set()} to \textbf{motorCtrlT}. This ensures that velocity is measured and the control output for power is updated every 100ms.
+
+\bigskip
+\lstinputlisting[language=C++]{motor1.cpp}
+\bigskip
+
+Furthermore, when calculating velocity and distance error, the mutex \textbf{maxSpeed\_mutex }is used to protect the variable \textbf{maxSpeed} and the mutex \textbf{targetPosition\_mutex} is used to protect the variable \textbf{targetPosition} from simulataneous access. This is important because the decode command thread also needs to write to these variables when speed and position commands are received from the host. An example of this is shown below.
+
+\bigskip
+\lstinputlisting[language=C++]{motor2.cpp}
+\bigskip
 
 \subsection{Melody}
 
@@ -184,6 +247,38 @@ After setting the new PWM period using \textbf{tone} and \textbf{tonefreqmap} in
 This task is dependent on a non-empty \textbf{tonesQ}. This dependency is released by \textbf{TerminalListenerThread} when a melody command is received from the user. 
 
 \subsection{Decoding Messages}
+
+\noindent The system receives commands from a host over a serial interface at 9600bps and follows the given syntax specifications:
+
+ \begin{itemize}
+	\item Each command ends with a carriage return character.
+	\item The syntax for rotation commands is the regular expression R-?\textbackslash{}d\{1,4\}(\textbackslash{}.\textbackslash{}d)?
+	\item The syntax for maximum speed commands is the regular expression V\textbackslash d \{1,3\}(\textbackslash{}.\textbackslash{}d)?
+	\item The syntax for setting the bitcoin key is the regular expression K[0-9a-fA-F]\{16\}
+	\item Matching bitcoin nonces should be sent to the host with a message matching the regular expression N[0-9a-fA-F]\{16\}
+	\item The syntax for melody commands is the regular expression T([A-G][\#\textasciicircum{}]?[1-8])\{1,16\} (where \# and \textasciicircum{}are characters)
+	
+\end{itemize}
+
+An interrupt service routine \textbf{serialISR} receives each incoming byte from the serial port and places it into a queue. This is done by using the method \textbf{uint8\_t RawSerial::getc()} to retrieve a byte from the serial port and the method \textbf{Mail::put()} to put a \textbf{Mail} message in a \textbf{mail\_box} queue.
+\bigskip
+
+Decoding messages is implemented in \textbf{TerminaListenerThread} as a normal priority thread. \textbf{serialISR} is attached to serial port events, and in an infinite loop the method \textbf{Mail::get()} is used to wait for new characters. Upon receiving a return carriage character from mail, the command message is passed to functions that try to match it with the expected syntax. The command message is then placed in another \textbf{mail\_box} to be communicated to the host via serial.
+
+\bigskip
+\lstinputlisting[language=C++]{decode1.cpp}   
+\bigskip       
+
+The method used detemine if the command message is valid varies for the different commands.The standard C++ regular expressions library is used to decode speed and position commands. The function \textbf{sscanf} is used to decode the new key command, and melody commands are decoded by iterating through the message string as shown below.
+
+\bigskip
+\lstinputlisting[language=C++]{decode2.cpp}  
+\bigskip
+If the message received from the serial port matches any of the expected commands, then the relevant changes are made to implement the command and a \textbf{Mail} message to confirm receiving a command is put into a \textbf{mail\_box} and communicated to the host via serial. 
+\bigskip
+
+In \textbf{decodeSpeedCommand}, for example, the new maximum speed is written into a global variable \textbf{maxSpeed} where it will be read by the motor control thread. This variable is protected by a mutex \textbf{maxSpeed\_mutex} to prevent simultaneous access.
+
 
 \subsection{Outputting Messages}
 
