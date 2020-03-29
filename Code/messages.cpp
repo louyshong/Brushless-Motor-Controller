@@ -28,18 +28,19 @@ void outputToTerminal (void) {
                 case(BITCOIN_NONCE):
                     pc.printf("\n\r Successful Nonce: %u\r\n ", mail->number);
                     break;
+                case(HASH_RATE):
+                    pc.printf("\n\r Hash Rate is: %f\n ", mail->dFloat);
+                    break;
                 case(UPDATED_KEY):
                     pc.printf("\n\r New Key: %u\r\n ", mail->number);
                     break;
-                case(MOTOR_VELOCITY):
-                    pc.printf("\n\r Target Vel: %f\n ", mail->dFloat);
-                    pc.printf("\r Actual Vel: %f\n ", mail->dFloat1);
-                    pc.printf("\r Motor Power: %f\n ", mail->dFloat2);
+                case(ERROR_STATUS):
+                    pc.printf("\n\r Distance Remaining: %f\n ", mail->dFloat);
+                    pc.printf("\r Position Error: %f\n ", mail->dFloat1);
                     break;
-                case(MOTOR_ROTATIONS):
-                    pc.printf("\r Target Pos: %f\n ", mail->dFloat);
-                    pc.printf("\r Actual Pos: %f\n ", mail->dFloat1);
-                    pc.printf("\r Motor Power: %f\n\n ", mail->dFloat2);
+                case(MOTOR_STATUS):
+                    pc.printf("\n\r Speed to go: %f\n ", mail->dFloat);
+                    pc.printf("\r Current Speed: %f\n ", mail->dFloat1);
                     break;
             }
 
@@ -74,13 +75,12 @@ void putMessage(int type, std::string message)
     mail_box.put(mail);
 }
 
-void putMessage(int type, double target, double actual, double controllerOutput)
+void putMessage(int type, double posError, double velError)
 {
     mail_t *mail = mail_box.alloc();
     mail->type = type;
-    mail->dFloat = target;
-    mail->dFloat1 = actual;
-    mail->dFloat2 = controllerOutput;
+    mail->dFloat = posError;
+    mail->dFloat1 = velError;
     mail_box.put(mail);
 }
 
@@ -91,9 +91,9 @@ void putMessage(int type, double target, double actual, double controllerOutput)
 // receive input data from terminal
 void serialISR()
 {
-   uint8_t* newChar = inCharQ.alloc();
-   *newChar = pc.getc();
-   inCharQ.put(newChar);
+    uint8_t* newChar = inCharQ.alloc();
+    *newChar = pc.getc();
+    inCharQ.put(newChar);
 }
 
 void decodeSpeedCommand(std::string input)
@@ -120,8 +120,12 @@ void decodePositionCommand(std::string input)
         sscanf(input.c_str(), "%c %f", &firstChar, &rotation);
         targetPosition_mutex.lock();
         targetPosition = position + (rotation*6);//convert input to segments
+        //std::string messageOut2 = "New Target Position: " + std::to_string(targetPosition);
         targetPosition_mutex.unlock();
-        putMessage(PRINT_MESSAGE, "Got Position Command");
+
+        std::string messageOut = "Got Position Command: " + std::to_string(rotation);
+        putMessage(PRINT_MESSAGE, messageOut);
+        //putMessage(PRINT_MESSAGE, messageOut2);
     }
 }
 
@@ -179,15 +183,12 @@ void decodeTuneCommand(std::string input)
     }
 }
 
+
 void decodeInputThread () {
 
     pc.attach(&serialISR);
     std::string command;
     
-    //initilise varibles to default start values
-    //maxSpeed = 600;
-    //targetPosition = 0;
-
     while (true) 
     {
         //Store the new character

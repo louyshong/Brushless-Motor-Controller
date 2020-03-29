@@ -13,8 +13,9 @@
 #define PRINT_MESSAGE 0
 #define BITCOIN_NONCE 1
 #define UPDATED_KEY 2
-#define MOTOR_VELOCITY 3
-#define MOTOR_ROTATIONS 4
+#define MOTOR_STATUS 3
+#define ERROR_STATUS 4
+#define HASH_RATE 5
 
 extern RawSerial pc;
 
@@ -35,13 +36,8 @@ void decodeInputThread();
 extern void putMessage(int type, uint8_t number);
 extern void putMessage(int type, double number);
 extern void putMessage(int type, std::string message);
-extern void putMessage(int type, double target, double actual, double controllerOutput);
+extern void putMessage(int type, double posError, double velError);
 
-// Variables that are updates by the decoder and accessible to the rest of the system
-//uint64_t newKey;  
-//std::queue<std::string> tonesQ;
-//float maxSpeed; //set initial max speed to 100 rotations (600 segments) /s
-//double targetPosition;
 
 
 #endif

@@ -9,5 +9,6 @@ void computeHash();
 extern Mutex newKey_mutex;
 extern volatile uint64_t newKey;
 
+const int const_hashRate = 5000;  // hashes to complete per-second
 
 #endif

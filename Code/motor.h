@@ -29,7 +29,7 @@
  
 //Test outputs
 #define TP0pin D4
-#define TP1pin D13
+#define TP1pin D13  // use this for CPU utilisation
 #define TP2pin A2
 
 extern Thread motorCtrlT;
@@ -48,7 +48,6 @@ extern double targetPosition;
 extern Mutex maxSpeed_mutex;
 extern Mutex motorPower_mutex;
 extern Mutex targetPosition_mutex;
-
 
 //Main thread to instantiate
 void motorCtrlFn();

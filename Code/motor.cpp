@@ -43,7 +43,7 @@ DigitalOut L2H(L2Hpin);
 DigitalOut L3L(L3Lpin);
 DigitalOut L3H(L3Hpin);
  
-DigitalOut TP1(TP1pin);
+//DigitalOut TP1(TP1pin);
 PwmOut MotorPWM(PWMpin);
 
 Mutex maxSpeed_mutex;
@@ -51,6 +51,9 @@ Mutex motorPower_mutex;
 Mutex targetPosition_mutex;
 
 float MAX_PWM = 1.0;
+
+// Mutex power_mutex;
+// float power_test = 0;
 
 //##########################################################################
 //------------------------------- VARIABLES --------------------------------
@@ -72,13 +75,13 @@ double targetPosition = 0;
 // velocity error
 float acc_v_error = 0.0;
 float MAX_V_ERROR = 880;
-float Kps = 0.023;  //scales error
+float Kps = 0.014;  //scales error
 float Kis = 0.0007; //dampens error
 float VE = 0.0;
 
 //distance error
-float Kpr = 0.017;    //scales error
-float Kdr = 0.015;   //dampens error
+float Kpr = 0.09;    //distance error constant
+float Kdr = 0.09;   //dampens error
 float DE = 0.0;
 
 //##########################################################################
@@ -135,16 +138,14 @@ int8_t motorHome() {
 //Poll the rotor state and set the motor outputs accordingly to spin the motor
 void UpdateMotorPosition()
 {
+    //TP1 = 1;
     intState = readRotorState();
     int8_t direction_detected = intState - intStateOld;
 
     //Update position
-    if (direction_detected > 0) {
-        position++; 
-    }
-    if (direction_detected < 0) {
-        position--;
-    }
+    if (direction_detected == 5) position--;
+    else if (direction_detected == -5) position++;
+    else position += (direction_detected);
 
     //Update direction
     if ((direction_detected != direction) && (abs(direction_detected) < 5)) {
@@ -154,7 +155,8 @@ void UpdateMotorPosition()
     intStateOld = intState;
     
     //Call motorOut
-    motorOut((intState - orState + lead + 6) % 6); //+6 to make sure the remainder is positive    
+    motorOut((intState - orState + lead + 6) % 6); //+6 to make sure the remainder is positive 
+    //TP1 = 0;   
 }
 
 //called to un-freeze thread
@@ -191,14 +193,18 @@ void InitialiseMotor()
     I2.fall(&UpdateMotorPosition);
     I3.rise(&UpdateMotorPosition);
     I3.fall(&UpdateMotorPosition);
+
+    //get field in correct start position
+    UpdateMotorPosition();
 }
 
-float VelocityError(double currentVelocity)
+// calculate the error due to speed difference
+float VelocityError(double currentSpeed)
 {
     //update error term
     targetPosition_mutex.lock();
     maxSpeed_mutex.lock();
-    float vError = (maxSpeed - currentVelocity);
+    float vError = (maxSpeed - currentSpeed);
     maxSpeed_mutex.unlock();
     targetPosition_mutex.unlock();
 
@@ -208,6 +214,8 @@ float VelocityError(double currentVelocity)
     if(acc_v_error < -MAX_V_ERROR) acc_v_error = -MAX_V_ERROR;
 
     //return error due to velocity delta
+    //double errorVal = Kps*vError + Kis*acc_v_error;
+    
     return Kps*vError + Kis*acc_v_error;
 }
 
@@ -215,16 +223,15 @@ float DistanceError(double timePassed)
 {
     // get current and previous distacne error
     targetPosition_mutex.lock();
-    maxSpeed_mutex.lock();
 
-    double posError = targetPosition - position;
+    double posError = (targetPosition - position);
     double posErrorOld = targetPosition - positionOld;
 
-    maxSpeed_mutex.unlock();
     targetPosition_mutex.unlock();
 
     return (Kpr*posError) + (Kdr*(posError - posErrorOld)/(timePassed));
 }
+
 
 //##########################################################################
 //-------------------------------- THREAD ----------------------------------
@@ -245,43 +252,52 @@ void motorCtrlFn()
     Timer printTimer;
     printTimer.start();
 
+
     while (1) 
     {
         motorCtrlT.signal_wait(0x1); //wait for signal (every 100ms)
 
-        //calculate velocity
-        double velocity = (position - positionOld) * (1 / (double)velocityTimer.read()); //calculating time taken for each revolution (this seems wrong, need to ask about it) 
+        // calculate velocity
+        double timeElapsed = velocityTimer.read();
+        velocityTimer.reset();
+        double velocity = (position - positionOld) * (1 / timeElapsed); //calculating time taken for each revolution (this seems wrong, need to ask about it) 
 
         //find distance error
-        DE = DistanceError((double)velocityTimer.read());
+        DE = DistanceError(timeElapsed);
+
+        // add non-linearity to prevent motor oscillation at small speeds (kills the error is within 0.5 rots)
+        if(abs(targetPosition - position) < 3)
+        {
+            DE = 0;
+        }
 
         //find velocity error
         VE = VelocityError(abs(velocity));
+        if(VE < 0) VE = 0;
 
         //choose error to pass to motor
-        float power_test = 0;
-        if (velocity >= 0)
-            power_test = std::min(VE,DE);
-        else
-            power_test = std::max(VE,DE);
-    
+        float power_test = std::min(abs(VE), abs(DE));
 
         //print velocity
-        if(printTimer.read() > 3.0)
+        if(printTimer.read() > 1.0)
         {
-            putMessage(MOTOR_ROTATIONS, (double)targetPosition/6, (double)position/6, DE);
-            putMessage(MOTOR_VELOCITY, (double)maxSpeed/6, (double)velocity/6, VE);
+            //float positionError = (targetPosition/6) - (position/6);
+            //double velocityError = (maxSpeed/6) - (velocity/6);
+            //putMessage(MOTOR_STATUS, velocityError, VE);
+
+            double distanceToGo = (targetPosition - position) /6;
+            putMessage(ERROR_STATUS, distanceToGo, DE);
+
             printTimer.reset();
         }
         
         //update/reset variables
         lead = (DE >= 0) ? 2 : -2;
-        lead = (VE < 0) ? -lead : lead; // torque in oppositve direction to slow the motor down
 
         //update/reset variables
         positionOld = position;
-        velocityTimer.reset();
         UpdateMotorPower(power_test);
+
     }
 }
 
