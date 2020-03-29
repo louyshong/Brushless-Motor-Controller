@@ -13,8 +13,8 @@
 #define PRINT_MESSAGE 0
 #define BITCOIN_NONCE 1
 #define UPDATED_KEY 2
-#define MOTOR_STATUS 3
-#define ERROR_STATUS 4
+#define DISTANCE_STATUS 3
+#define SPEED_STATUS 4
 #define HASH_RATE 5
 
 extern RawSerial pc;

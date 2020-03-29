@@ -29,17 +29,17 @@ void outputToTerminal (void) {
                     pc.printf("\n\r Successful Nonce: %u\r\n ", mail->number);
                     break;
                 case(HASH_RATE):
-                    pc.printf("\n\r Hash Rate is: %f\n ", mail->dFloat);
+                    pc.printf("\n\r Hash Rate is: %f\n ", mail->number);
                     break;
                 case(UPDATED_KEY):
                     pc.printf("\n\r New Key: %u\r\n ", mail->number);
                     break;
-                case(ERROR_STATUS):
-                    pc.printf("\n\r Distance Remaining: %f\n ", mail->dFloat);
-                    pc.printf("\r Position Error: %f\n ", mail->dFloat1);
+                case(DISTANCE_STATUS):
+                    pc.printf("\n\r Target Rotation: %f\n ", mail->dFloat);
+                    pc.printf("\r Current Rotation: %f\n ", mail->dFloat1);
                     break;
-                case(MOTOR_STATUS):
-                    pc.printf("\n\r Speed to go: %f\n ", mail->dFloat);
+                case(SPEED_STATUS):
+                    pc.printf("\r Target Speed: %f\n ", mail->dFloat);
                     pc.printf("\r Current Speed: %f\n ", mail->dFloat1);
                     break;
             }

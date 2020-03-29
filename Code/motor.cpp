@@ -278,15 +278,11 @@ void motorCtrlFn()
         //choose error to pass to motor
         float power_test = std::min(abs(VE), abs(DE));
 
-        //print velocity
+        //print rotations and speed
         if(printTimer.read() > 1.0)
         {
-            //float positionError = (targetPosition/6) - (position/6);
-            //double velocityError = (maxSpeed/6) - (velocity/6);
-            //putMessage(MOTOR_STATUS, velocityError, VE);
-
-            double distanceToGo = (targetPosition - position) /6;
-            putMessage(ERROR_STATUS, distanceToGo, DE);
+            putMessage(SPEED_STATUS, (maxSpeed/6), (velocity/6));
+            putMessage(DISTANCE_STATUS, (targetPosition/6), (position/6));
 
             printTimer.reset();
         }

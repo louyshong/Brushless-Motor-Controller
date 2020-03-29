@@ -3,15 +3,17 @@
 
 Mutex newKey_mutex;
 
-Timer hashRateTimer;
-int hashesCompleted = 0;
-
-uint64_t totalCompleteHashes = 0;
-Timer total_Hash_Rate_Timer;
-
 //------------------- Bitcoin Mining ------------------------
+void bitcoinTick(){
+    BitcoinThread.signal_set(0x1);
+}
+
+
 void computeHash()
 {
+    Ticker bitcoinTicker;
+    bitcoinTicker.attach(&bitcoinTick, 1.0);
+
     uint8_t sequence[] = {0x45,0x6D,0x62,0x65,0x64,0x64,0x65,0x64,
     0x20,0x53,0x79,0x73,0x74,0x65,0x6D,0x73,
     0x20,0x61,0x72,0x65,0x20,0x66,0x75,0x6E,
@@ -26,13 +28,13 @@ void computeHash()
 
     SHA256 hasher;
     
-    hashRateTimer.start();
-    total_Hash_Rate_Timer.start();
 
     while(true)
     {
+        BitcoinThread.signal_wait(0x1); //wait for signal (every second)
+
         //complete 5000 hashes ASAP
-        if(hashesCompleted < const_hashRate)
+        for(int i = 0; i < CONST_HASH_RATE; i++)
         {
             //assign new key
             newKey_mutex.lock();
@@ -47,26 +49,6 @@ void computeHash()
             }
 
             *nonce += 1;
-            hashesCompleted ++;
-            totalCompleteHashes ++;
-
-
-        }
-        else    // reset time and hashes complete if one second has passed
-        {
-            if(hashRateTimer.read_ms() >= 1000)
-            {
-                hashRateTimer.reset();
-                hashesCompleted = 0;
-            }
-        }
-        
-        if(total_Hash_Rate_Timer.read() > 2.0)
-        {
-            double hashRate = totalCompleteHashes / (double)total_Hash_Rate_Timer.read();
-            totalCompleteHashes = 0;
-            //putMessage(HASH_RATE, hashRate);
-            total_Hash_Rate_Timer.reset();
         }
 
     }

@@ -8,7 +8,8 @@ void computeHash();
 
 extern Mutex newKey_mutex;
 extern volatile uint64_t newKey;
+extern Thread BitcoinThread;
 
-const int const_hashRate = 5000;  // hashes to complete per-second
+const int CONST_HASH_RATE = 5000;  // hashes to complete per-second
 
 #endif
