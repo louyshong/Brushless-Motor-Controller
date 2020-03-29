@@ -8,7 +8,7 @@
 \usepackage{amsmath} % Maths type package
 \usepackage{bm} % Bold font maths
 \usepackage{graphicx} % Advanced graphics package
-\usepackage[export]{adjustbox} 
+\usepackage[export]{adjustbox}
 \usepackage{pdflscape} % Make pages landscape
 \usepackage{fancyhdr} % Fancy headers
 \usepackage[colorlinks=true,citecolor=blue,urlcolor=blue,linkcolor=black]{hyperref} % Link colours
@@ -26,26 +26,26 @@
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 
 \lstdefinestyle{mystyle}{
-    backgroundcolor=\color{backcolour},   
+    backgroundcolor=\color{backcolour},
     commentstyle=\color{codegreen},
     keywordstyle=\color{magenta},
     numberstyle=\tiny\color{codegray},
     stringstyle=\color{codepurple},
     basicstyle=\ttfamily\footnotesize,
-    breakatwhitespace=false,         
-    breaklines=true,                 
-    captionpos=b,                    
-    keepspaces=true,                 
-    numbers=left,                    
-    numbersep=5pt,                  
-    showspaces=false,                
+    breakatwhitespace=false,
+    breaklines=true,
+    captionpos=b,
+    keepspaces=true,
+    numbers=left,
+    numbersep=5pt,
+    showspaces=false,
     showstringspaces=false,
-    showtabs=false,                  
+    showtabs=false,
     tabsize=2
 }
- 
+
 \lstset{style=mystyle}
-\graphicspath{ {Images/} } % Folder for images 
+\graphicspath{ {Images/} } % Folder for images
 
 %~~~~~~~~~ Multi-column setup
 \usepackage{multicol} % Multi Column Environment
@@ -74,32 +74,32 @@
 \begin{titlepage}
     \begin{center}
         \vspace*{1cm}
-            
+
         \Huge
         \textbf{Embedded Systems}
-            
+
         \vspace{0.5cm}
         \LARGE
         \textbf{Brushless Motor Controller}
-            
+
         \vspace{1.5cm}
-            
-        \textbf{Team Name: Friends}\\ 
-            
+
+        \textbf{Team Name: Friends}\\
+
         \vfill
-            
+
         Coursework 2 Report\\
-       
-            
+
+
         \vspace{0.8cm}
-         
-            
+
+
         \Large
         \textbf{Team Members:}\\
         Sajid Ali\\
         Tuck Hong 01336059\\
         Lulwa Alkhalifa 01351905 \\
-            
+
     \end{center}
 \end{titlepage}
 
@@ -218,12 +218,12 @@ Furthermore, when calculating velocity and distance error, the mutex \textbf{max
 \subsection{Melody}
 
 \noindent
-By modulating the PWM period and hence the drive current, the motor effectively behaves like a tune generator. A separate thread \textbf{TuneThread} is responsible for changing the PWM period based on the notes present in melody commands given by the user. The notes that are allowed belong to the C4 octave, in other words, frequencies 261.63 Hz (C4) up to 493.88 Hz (B4).   
+By modulating the PWM period and hence the drive current, the motor effectively behaves like a tune generator. A separate thread \textbf{TuneThread} is responsible for changing the PWM period based on the notes present in melody commands given by the user. The notes that are allowed belong to the C4 octave, in other words, frequencies 261.63 Hz (C4) up to 493.88 Hz (B4).
 
 \bigskip
 
 \noindent
-First, a map containing all the allowed notes and their corresponding PWM periods is initialised. Note that the PWM periods (in $\mu$s) are calculated using $\frac{1000000}{frequency}$. 
+First, a map containing all the allowed notes and their corresponding PWM periods is initialised. Note that the PWM periods (in $\mu$s) are calculated using $\frac{1000000}{frequency}$.
 
 \bigskip
 
@@ -232,7 +232,7 @@ First, a map containing all the allowed notes and their corresponding PWM period
 \bigskip
 
 \noindent
-In an infinite loop, the thread repeats the following steps where \textbf{tonesQ} is a queue containing the notes and durations that need to be played. 
+In an infinite loop, the thread repeats the following steps where \textbf{tonesQ} is a queue containing the notes and durations that need to be played.
 
 \bigskip
 
@@ -241,22 +241,22 @@ In an infinite loop, the thread repeats the following steps where \textbf{tonesQ
 \bigskip
 
 \noindent
-Since \textbf{tonesQ} is a shared data structure also accessed by \textbf{TerminalListenerThread}, the popping and pushing actions are protected with a mutex. Note that after popping a tone from \textbf{tonesQ} the same tone is immediately pushed back, as the specification requires the motor to play a given melody on loop. 
+Since \textbf{tonesQ} is a shared data structure also accessed by \textbf{TerminalListenerThread}, the popping and pushing actions are protected with a mutex. Note that after popping a tone from \textbf{tonesQ} the same tone is immediately pushed back, as the specification requires the motor to play a given melody on loop.
 
 \bigskip
 
 \noindent
-Following the regex for melody commands where the last entry in the command is an integer corresponding to the duration of the note (number of eighths of a second), the exact duration in milliseconds is obtained in line 8. Note that \textbf{(int)'0'} represents the offset value for numerical ASCII characters such that when subtracted from \textbf{(int)duration}, duration (which is a \textbf{char}) is effectively ``converted" into an \textbf{int}. 
+Following the regex for melody commands where the last entry in the command is an integer corresponding to the duration of the note (number of eighths of a second), the exact duration in milliseconds is obtained in line 8. Note that \textbf{(int)'0'} represents the offset value for numerical ASCII characters such that when subtracted from \textbf{(int)duration}, duration (which is a \textbf{char}) is effectively ``converted" into an \textbf{int}.
 
 \bigskip
 
 \noindent
-After setting the new PWM period using \textbf{tone} and \textbf{tonefreqmap} initialised previously, the thread is then put to sleep using \textbf{ThisThread::sleep\_for(interval)} so that a given note will last for the specified amount of time before the loop continues with the next note to be played. This solves the issue of blocking other threads from running (e.g. the bitcoin thread which will result in the thread failing to meet 5000 nonces per second) when \textbf{wait} is used instead.   
+After setting the new PWM period using \textbf{tone} and \textbf{tonefreqmap} initialised previously, the thread is then put to sleep using \textbf{ThisThread::sleep\_for(interval)} so that a given note will last for the specified amount of time before the loop continues with the next note to be played. This solves the issue of blocking other threads from running (e.g. the bitcoin thread which will result in the thread failing to meet 5000 nonces per second) when \textbf{wait} is used instead.
 
 \bigskip
 
 \noindent
-This task is dependent on a non-empty \textbf{tonesQ}. This dependency is released by \textbf{TerminalListenerThread} when a melody command is received from the user. 
+This task is dependent on a non-empty \textbf{tonesQ}. This dependency is released by \textbf{TerminalListenerThread} when a melody command is received from the user.
 
 \subsection{Decoding Messages}
 
@@ -269,7 +269,7 @@ This task is dependent on a non-empty \textbf{tonesQ}. This dependency is releas
 	\item The syntax for setting the bitcoin key is the regular expression K[0-9a-fA-F]\{16\}
 	\item Matching bitcoin nonces should be sent to the host with a message matching the regular expression N[0-9a-fA-F]\{16\}
 	\item The syntax for melody commands is the regular expression T([A-G][\#\textasciicircum{}]?[1-8])\{1,16\} (where \# and \textasciicircum{}are characters)
-	
+
 \end{itemize}
 
 \noindent
@@ -280,18 +280,20 @@ An interrupt service routine \textbf{serialISR} receives each incoming byte from
 Decoding messages is implemented in \textbf{TerminaListenerThread} as a normal priority thread. \textbf{serialISR} is attached to serial port events, and in an infinite loop the method \textbf{Mail::get()} is used to wait for new characters. Upon receiving a return carriage character from mail, the command message is passed to functions that try to match it with the expected syntax. The command message is then placed in another \textbf{mail\_box} to be communicated to the host via serial.
 
 \bigskip
-\lstinputlisting[language=C++]{decode1.cpp}   
-\bigskip       
+\lstinputlisting[language=C++]{decode1.cpp}
+\bigskip
 
 \noindent
 The method used detemine if the command message is valid varies for the different commands.The standard C++ regular expressions library is used to decode speed and position commands. The function \textbf{sscanf} is used to decode the new key command, and melody commands are decoded by iterating through the message string as shown below.
 
 \bigskip
-\lstinputlisting[language=C++]{decode2.cpp}  
+\lstinputlisting[language=C++]{decode2.cpp}
 \bigskip
-If the message received from the serial port matches any of the expected commands, then the relevant changes are made to implement the command and a \textbf{Mail} message to confirm receiving a command is put into a \textbf{mail\_box} and communicated to the host via serial. 
+If the message received from the serial port matches any of the expected commands, then the relevant changes are made to implement the command and a \textbf{Mail} message to confirm receiving a command is put into a \textbf{mail\_box} and communicated to the host via serial.
 \bigskip
 
+
+\noindent
 In \textbf{decodeSpeedCommand}, for example, the new maximum speed is written into a global variable \textbf{maxSpeed} where it will be read by the motor control thread. This variable is protected by a mutex \textbf{maxSpeed\_mutex} to prevent simultaneous access.
 
 
@@ -300,12 +302,17 @@ In \textbf{decodeSpeedCommand}, for example, the new maximum speed is written in
 \subsection{Bitcoin Mining}
 
 \noindent
-The bitcoin mining task is implemented in \textbf{BitcoinThread} as a low priority thread. The task is to look for matching nonces such that when combined with a key provided by the user and the 48 bytes of constant payload, will produce a SHA-256 hash that begins with 16 zeros. This is done by simply initialising the nonce to 0 and incrementing by one on each attempt. 
+The bitcoin mining task is implemented in \textbf{BitcoinThread} as a low priority thread. The task is to look for matching nonces such that when combined with a key provided by the user and the 48 bytes of constant payload, will produce a SHA-256 hash that begins with 16 zeros. This is done by simply initialising the nonce to 0 and incrementing by one on each attempt.
 
 \bigskip
 
 \noindent
-In order to regulate the mining task so that it satisfies the throughput specification of exactly 5000 nonces per second, the \textbf{Ticker} class is used to set up a timer interrupt that sends a signal to \textbf{BitcoinThread} every second. Every time the thread is released by the signal (which happens once per second), 5000 nonces are tested. The specification also requires the thread to send matching nonces back to the host. This is done by putting a \textbf{Mail} message pointer of type \textbf{BITCOIN\_NONCE} in the \textbf{mail\_box} queue. 
+In order to regulate the mining task so that it satisfies the throughput specification of exactly 5000 nonces per second, the \textbf{Ticker} class is used to set up a timer interrupt that sends a signal to \textbf{BitcoinThread} every second. Every time the thread is released by the signal (which happens once per second), 5000 nonces are tested.
+
+\bigskip
+
+\noindent
+The specification also requires the thread to send matching nonces back to the host. This is done by putting a \textbf{Mail} message pointer of type \textbf{BITCOIN\_NONCE} in the \textbf{mail\_box} queue.
 
 \bigskip
 
@@ -314,7 +321,7 @@ In order to regulate the mining task so that it satisfies the throughput specifi
 \bigskip
 
 \noindent
-A dependency this task has is the semaphore-like signal from the timer interrupt. This dependency is released once per second (by the timer interrupt). Note that a mutex is used here as \textbf{newKey} is a shared variable that is also accessed by \textbf{TerminalListenerThread} when a new bitcoin key is set by the user. 
+A dependency this task has is the semaphore-like signal from the timer interrupt. This dependency is released once per second (by the timer interrupt). Note that a mutex is used here as \textbf{newKey} is a shared variable that is also accessed by \textbf{TerminalListenerThread} when a new bitcoin key is set by the user.
 
 
 \subsection{Dependency Graph}
@@ -335,7 +342,10 @@ A dependency this task has is the semaphore-like signal from the timer interrupt
 \noindent
 The CPU usage of each task running in the micro-controller was indirectly observed by pulling one of the digital I/O pins high and low to show when a task was executing. Measuring the time the between pulses and the duration of each pulse would tell us the initiation interval and execution time of each task.
 
-We used a USB oscilloscope to take the measurements. An example of a trace we obtained is shown below.
+\bigskip
+
+\noindent
+We used a USB oscilloscope to take the measurements. An example of a trace we obtained is shown in Figure 2.
 
 \begin{figure}[H]
 \begin{center}
@@ -356,13 +366,13 @@ We used a USB oscilloscope to take the measurements. An example of a trace we ob
 Task & Initiation Interval (t) & Execution Time (T) & CPU Utilization (U) \\ [0.5ex]   % inserts table %heading
 \hline                          % inserts 1 horizontal line
 ISR & 1.28ms & 5.0us & 0.40\% \\           % table contents
-Output & 1.0s & 101ms & 10.11\% \\                         
+Output & 1.0s & 101ms & 10.11\% \\
 Motor Control & 100ms & 75us  & 0.08\% \\
 Decode & - & 53us & - \\
 BitCoin Mining & 1.0s & 868ms & 86.8\% \\
 Melody & 0.125s & 1.0us & ~0\% \\[1ex]     % [1ex] adds vertical space
 \end{tabular}
-\caption{Task timing and resource utilization.} 
+\caption{Task timing and resource utilization.}
 \label{table:nonlin}            % is used to refer this table in the text
 \end{table}
 
@@ -399,27 +409,5 @@ The results are summarised in the figure below. As you can see, after all the ta
 \label{fig:long}
 \label{fig:onecol}
 \end{figure}
-
-
-
-
-
-
-
-\section{Citing and referencing}
-
-\subsection{Referencing figures and equations}
- Expression $4\times 3=G\times x$ naturally follows from Eq \ref{eq:lovely formula}, and both of these things have a lot to do with Fig \ref{fig:frog in multicol}.
- 
- \subsection{Citing a paper}
-This statement has a citation at the end of it \cite{toadetal1958}, and this one has two \cite{toadetal1958, squeaker1982}. A citation with parenthesis is sure to follow \citep{siddiqi2004interspecific}.
-
- 
-
-
-%~~~~~~~~~ Bibliography
-\bibliographystyle{abbrvnat}
-\setcitestyle{authoryear}
-\bibliography{bib}
 
 \end{document}
