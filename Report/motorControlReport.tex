@@ -138,14 +138,77 @@ In this report is summarised the implementation of a brushless motor controller 
 \section{Motor Control Implementation}
 \subsection{Position and Velocity Measurements}
 
+I'm guessing this has probably changed since yesterday. I'm so sorry about that :(
+
 \subsection{Velocity Control}
 
+Velocity was controlled using a proportional and integral term in the control equation.
+
+\[ y_s = \left( k_p(s-v)+ k_i\int(s-v)dt\right)\textrm{sgn}(E_r)\]
+
+\(y_s\) is the speed controller output which is compared with the position controller output to determine the motor PWM. \(k_p\)and \(k_i\) are the tuning parameters, \(s\) is the maximum speed (set by the host and initialised at 100 rotations per second upon startup) , \(E_r\) is the position error, and \(v\) is the measured velocity. The integral term is implemented as follows:
+
+\bigskip
+
+\lstinputlisting[language=C++]{velocity1.cpp}
+
+
+\bigskip
+
+Further processing is done to convert the controller output into a PWM duty cycle. The absolute value of \(y_s\) is considered and the value of lead is modified to take the direction of rotation into account.
+
+\bigskip
+
+\lstinputlisting[language=C++]{velocity2.cpp}
+
+\bigskip
+
+Also a limit is applied so that the PWM duty cycle (\textbf{power}) does not exceed the maximum value of 1
+
+\bigskip
+
+\lstinputlisting[language=C++]{velocity3.cpp}
+
+\bigskip
+
 \subsection{Position Control}
+
+For position control both a proportional and differential term are used.
+
+\[y_r = k_pE_r + k_d \frac{dE_r}{dt}\]
+
+\(k_p\) and \(k_d\) are the tuning parameters, and \(E_r\) is the position error. This is calculated as shown below:
+
+\bigskip
+\lstinputlisting[language=C++]{position1.cpp}
+\bigskip
+
+Combining velocity and position control is done by choosing the most conservative value and is implemented as follows:
+
+\bigskip
+\lstinputlisting[language=C++]{position2.cpp}
+\bigskip
 
 
 
 \section{Tasks and Dependencies}
 \subsection{Motor Control}
+
+Motor control is implemented in a high priority thread \textbf{motorCtrlT}. Within the main function responsible for motor control \textbf{motorCtrlFn}, the interrupt service routine \textbf{UpdateMotorPos} is attached to the photo-interrupter inputs, such that the motor PWM is updated whenever there is a change in any of the inputs.
+
+\bigskip
+
+A ticker object is also created within \textbf{motorCrtlT} and the callback function \textbf{motorCtrlTick()} is attached, such that it runs every 100ms. The purpose of this interrupt is to set a signal using the RTOS function \textbf{Thread::signal\_set()} to \textbf{motorCtrlT}. This ensures that velocity is measured and the control output for power is updated every 100ms.
+
+\bigskip
+\lstinputlisting[language=C++]{motor1.cpp}
+\bigskip
+
+Furthermore, when calculating velocity and distance error, the mutex \textbf{maxSpeed\_mutex }is used to protect the variable \textbf{maxSpeed} and the mutex \textbf{targetPosition\_mutex} is used to protect the variable \textbf{targetPosition} from simulataneous access. This is important because the decode command thread also needs to write to these variables when speed and position commands are received from the host. An example of this is shown below.
+
+\bigskip
+\lstinputlisting[language=C++]{motor2.cpp}
+\bigskip
 
 \subsection{Melody}
 
