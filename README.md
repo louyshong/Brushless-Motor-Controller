@@ -4,3 +4,6 @@
 - Sajid Ali
 - Lulwa Alkhalifa
 - Tuck Hong
+
+To run the code, copy and paste each file into mbed IDE.
+Using standard libraries supplied in the coursework material.
