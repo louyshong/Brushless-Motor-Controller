@@ -115,6 +115,7 @@
 
 \section{Introduction}
 \subsection{Brief}
+\noindent
 In this report is summarised the implementation of a brushless motor controller which performs additional lower priority tasks in an embedded system.
 
 \subsection{Specification}
@@ -135,6 +136,8 @@ In this report is summarised the implementation of a brushless motor controller 
 
 \noindent
 The code for updating the position and speed of the motor can be found below. The position of the rotor is updated in the ISR whenever the state changes.
+
+\bigskip
 
 \noindent
 The velocity is calculated in the motor control thread every 100ms using the up to date position. A timer is used to calculate the time-elapsed since the last velocity measurement as opposed to assuming its 100ms; this is to improve the accuracy of the result.
@@ -187,7 +190,13 @@ For position control both a proportional and differential term are used.
 
 \[y_r = k_pE_r + k_d \frac{dE_r}{dt}\]
 
-\(k_p\) and \(k_d\) are the tuning parameters, and \(E_r\) is the position error. This is calculated as shown below:
+\noindent
+where \(k_p\) and \(k_d\) are the tuning parameters, and \(E_r\) is the position error.
+
+\bigskip
+
+\noindent
+This is calculated as shown below:
 
 \bigskip
 \lstinputlisting[language=C++]{position1.cpp}
@@ -205,8 +214,7 @@ A non-linearity is applied the distance error term to prevent oscillations at lo
 
 \subsection{Accuracy Measurements}
 \noindent
-Once the controller had been implemented and optimised we carried out tests to ensure the specification would be met.
-We varied the target speed of the rotor and measured the steady state velocity (i.e. the velocity when the only constraint on the motor power was the target speed ). We also noted the final position of the rotor and compared it to the target position.
+Once the controller had been implemented and optimised we carried out tests to ensure the specification would be met. We varied the target speed of the rotor and measured the steady state velocity (i.e. the velocity when the only constraint on the motor power was the target speed). We also noted the final position of the rotor and compared it to the target position.
 
 \bigskip
 
@@ -232,15 +240,15 @@ The speed of the motor was varied from 10-100 rps by increasing the speed in int
 Target Speed (rps) & Target Distance (r) & Actual Distance (r) & Steady State Speed (rps) \\ [0.5ex]   % inserts table %heading
 \hline                          % inserts 1 horizontal line
 10 & 1000.00 & 1000.00 & 10.01 \\           % table contents
-20 & 1000.00 & 1000.00 & 19.97 \\  
-30 & 1000.00 & 1000.00 & 29.99 \\  
-40 & 1000.00 & 1000.00 & 40.01 \\  
-50 & 1000.00 & 1000.00 & 49.85 \\  
-60 & 1000.00 & 1000.00 & 60.01 \\  
-70 & 1000.00 & 1000.00 & 69.94 \\  
-80 & 2000.00 & 1999.50 & 80.01 \\  
-90 & 2000.00 & 2000.00 & 89.97 \\  
-100 & 2000.00 & 1999.50 & 99.98 \\  
+20 & 1000.00 & 1000.00 & 19.97 \\
+30 & 1000.00 & 1000.00 & 29.99 \\
+40 & 1000.00 & 1000.00 & 40.01 \\
+50 & 1000.00 & 1000.00 & 49.85 \\
+60 & 1000.00 & 1000.00 & 60.01 \\
+70 & 1000.00 & 1000.00 & 69.94 \\
+80 & 2000.00 & 1999.50 & 80.01 \\
+90 & 2000.00 & 2000.00 & 89.97 \\
+100 & 2000.00 & 1999.50 & 99.98 \\
 \end{tabular}
 \caption{Position and speed accuracy measurements.}
 \label{table:nonlin}            % is used to refer this table in the text
@@ -267,6 +275,9 @@ Furthermore, when calculating velocity and distance error, the mutex \textbf{max
 \bigskip
 \lstinputlisting[language=C++]{motor2.cpp}
 \bigskip
+
+\noindent
+A dependency this task has is the semaphore-like signal from the timer ticker. This dependency is released every 100ms (by the timer interrupt).
 
 \subsection{Melody}
 
@@ -326,7 +337,7 @@ This task is dependent on a non-empty \textbf{tonesQ}. This dependency is releas
 \end{itemize}
 
 \noindent
-An interrupt service routine \textbf{serialISR} receives each incoming byte from the serial port and places it into a queue. This is done by using the method \textbf{uint8\_t RawSerial::getc()} to retrieve a byte from the serial port and the method \textbf{Mail::put()} to put a \textbf{Mail} message in a \textbf{mail\_box} queue.
+An interrupt service routine \textbf{serialISR} receives each incoming byte from the serial port and places it into a queue (\textbf{inCharQ}). This is done by using the method \textbf{uint8\_t RawSerial::getc()} to retrieve a byte from the serial port and the method \textbf{Mail::put()} to put a \textbf{Mail} message in a \textbf{mail\_box} queue.
 \bigskip
 
 \noindent
@@ -349,11 +360,15 @@ If the message received from the serial port matches any of the expected command
 \noindent
 In \textbf{decodeSpeedCommand}, for example, the new maximum speed is written into a global variable \textbf{maxSpeed} where it will be read by the motor control thread. This variable is protected by a mutex \textbf{maxSpeed\_mutex} to prevent simultaneous access.
 
+\bigskip
+
+\noindent
+This task is dependent on a non-empty \textbf{inCharQ}. This dependency is released by \textbf{serialISR} when a characters are received from the user.
 
 \subsection{Outputting Messages}
 
 \noindent
-Our system can print many different types of messages from different threads each of which may require different size and types of data.
+Our system can print many different types of messages each of which may require different size and types of data.
 To streamline the code we decided to create a single mail struct which could hold a wide variety of data. This means that the size of print items is longer than it could have been, but it uses fewer lines of code and means we need a queue of only a single type.
 
 \bigskip
@@ -366,13 +381,15 @@ Items are added to the print queue through the calling of any of the \textbf{put
 \bigskip
 
 \noindent
-Printing messages to the terminal is handled by the \textbf{MessengerThread} which calls the function \textbf{outputToTerminal()}. The functions contains an infinite loop which constantly polls the \textbf{main\_box} to see if the queue is not empty. Once a message is pulled from the queue the type is checked and a custom print format is applied depending on the type. Finally, the \textbf{main\_box} is released.
+Printing messages to the terminal is handled by the \textbf{MessengerThread} which calls the function \textbf{outputToTerminal()}. The functions contains an infinite loop which constantly polls the \textbf{mail\_box} to see if the queue is not empty. Once a message is pulled from the queue the type is checked and a custom print format is applied depending on the type. Finally, the \textbf{mail\_box} is released.
 
 
 \bigskip
 \lstinputlisting[language=C++]{output.cpp}
 \bigskip
 
+\noindent
+This task is dependent on a non-empty \textbf{mail\_box}. This dependency is released by \textbf{TerminalListenerThread} when commands are decoded.
 
 \subsection{Bitcoin Mining}
 
@@ -406,7 +423,7 @@ A dependency this task has is the semaphore-like signal from the timer interrupt
 %\fbox{\rule{0pt}{1in} \rule{0.8\linewidth}{0pt}}
    \includegraphics[width=0.9\linewidth]{dependency.png}
 \end{center}
-   \caption{Dependency flow chart.}
+   \caption{Dependency graph showing no possibility of deadlock. Note that mutexes are excluded from this analysis.}
 \label{fig:long}
 \label{fig:onecol}
 \end{figure}
@@ -438,14 +455,14 @@ We used a USB oscilloscope to take the measurements. An example of a trace we ob
 \begin{table}[ht]
 \centering                      % used for centering table
 \begin{tabular}{c c c c}        % centered columns (4 columns)
-Task & Initiation Interval (t) & Execution Time (T) & CPU Utilization (U) \\ [0.5ex]   % inserts table %heading
+Task & Initiation Interval (t) & Execution Time (T) & Task Utilization (U) \\ [0.5ex]   % inserts table %heading
 \hline                          % inserts 1 horizontal line
-ISR & 1.28ms & 5.0us & 0.40\% \\           % table contents
+Motor ISR & 1.28ms & 5.0us & 0.40\% \\           % table contents
 Output & 1.0s & 101ms & 10.11\% \\
 Motor Control & 100ms & 75us  & 0.08\% \\
-Decode & - & 53us & - \\
+Decode & 93.75ms & 53us & 0.0565\% \\
 BitCoin Mining & 1.0s & 868ms & 86.8\% \\
-Melody & 0.125s & 1.0us & ~0\% \\[1ex]     % [1ex] adds vertical space
+Melody & 0.125s & 1.0us & 0.0008\% \\[1ex]     % [1ex] adds vertical space
 \end{tabular}
 \caption{Task timing and resource utilization.}
 \label{table:nonlin}            % is used to refer this table in the text
