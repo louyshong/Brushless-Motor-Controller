@@ -5,5 +5,5 @@
 - Lulwa Alkhalifa
 - Tuck Hong
 
-To run the code, copy and paste each file into mbed IDE.
+To run the code, copy and paste each file into mbed IDE. Or equally use the .bin compiled file.
 Using standard libraries supplied in the coursework material.
