@@ -74,9 +74,10 @@ double targetPosition = 0;
 //------------- Control Variables ------------
 // velocity error
 float acc_v_error = 0.0;
-float MAX_V_ERROR = 880;
+//float MAX_V_ERROR = 880;
+float MAX_V_ERROR = 1000;
 float Kps = 0.014;  //scales error
-float Kis = 0.0007; //dampens error
+float Kis = 0.0008; //dampens error
 float VE = 0.0;
 
 //distance error
@@ -172,9 +173,6 @@ void UpdateMotorPower(float power)
     if(power > 1.0) power = 1.0;
 
     MotorPWM.write(power);
-        //lead = 2 * ((controllerOutput > 0) - (controllerOutput < 0)); //lead set to 2*sgn(y_s)
-
-        //lead = (controllerOutput > 0) ? 2 : -2;
 }
 
 void InitialiseMotor() 
@@ -260,7 +258,7 @@ void motorCtrlFn()
         // calculate velocity
         double timeElapsed = velocityTimer.read();
         velocityTimer.reset();
-        double velocity = (position - positionOld) * (1 / timeElapsed); //calculating time taken for each revolution (this seems wrong, need to ask about it) 
+        double velocity = (position - positionOld) * (1 / timeElapsed);
 
         //find distance error
         DE = DistanceError(timeElapsed);

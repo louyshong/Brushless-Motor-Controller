@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7200 64-bit) (preloaded format=pdflatex 2019.11.12)  29 MAR 2020 19:35
+This is pdfTeX, Version 3.14159265-2.6-1.40.20 (MiKTeX 2.9.7200 64-bit) (preloaded format=pdflatex 2019.11.12)  30 MAR 2020 10:42
 entering extended mode
 **./motorControlReport.tex
 (motorControlReport.tex
@@ -1157,6 +1157,15 @@ LaTeX Warning: Label `fig:long' multiply defined.
 
 LaTeX Warning: Label `fig:onecol' multiply defined.
 
+
+LaTeX Warning: Label `table:nonlin' multiply defined.
+
+
+LaTeX Warning: Label `fig:long' multiply defined.
+
+
+LaTeX Warning: Label `fig:onecol' multiply defined.
+
 )
 \openout1 = `motorControlReport.aux'.
 
@@ -1293,112 +1302,97 @@ ty"
 File: lstmisc.sty 2020/03/24 1.8d (Carsten Heinz)
 )
 Package hyperref Info: bookmark level for unknown lstlisting defaults to 0 on i
-nput line 150.
- (velocity1.cpp) (velocity2.cpp) (velocity3.cpppdfTeX warning (ext4): destinati
-on with the same identifier (name{page.1}) has been already used, duplicate ign
-ored
+nput line 144.
+ (posVel.cpp) (velocity1.cpp)pdfTeX warning (ext4): destination with the same i
+dentifier (name{page.1}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.7 }
-      [1
+l.167 
+       [1
 
-]) (position1.cpp) (position2.cpp) (motor1.cpp [2]) (motor2.cpp)
-(melody1.cpp) (melody2.cpp) [3] (decode1.cpp) [4] (decode2.cpp) (bitcoin1.cpp
-[5])
-<dependency.png, id=269, 3009.2425pt x 1495.5875pt>
-File: dependency.png Graphic file (type png)
-<use dependency.png>
-Package pdftex.def Info: dependency.png  used on input line 325.
-(pdftex.def)             Requested size: 380.26768pt x 188.97902pt.
-<ScopeOutput.png, id=271, 1005.7575pt x 754.31813pt>
-File: ScopeOutput.png Graphic file (type png)
-<use ScopeOutput.png>
-Package pdftex.def Info: ScopeOutput.png  used on input line 343.
-(pdftex.def)             Requested size: 380.26768pt x 285.19362pt.
- [6pdfTeX warning (ext4): destination with the same identifier (name{figure.1})
- has been already used, duplicate ignored
+] (velocity2.cpp) (velocity3.cpp) (position1.cpp) (position2.cpp)
+<position accuracy.png, id=140, 187.45032pt x 62.48344pt>
+File: position accuracy.png Graphic file (type png)
+<use position accuracy.png>
+Package pdftex.def Info: position accuracy.png  used on input line 219.
+(pdftex.def)             Requested size: 211.26126pt x 70.4243pt.
+
+[2] (motor1.cpp) [3pdfTeX warning (ext4): destination with the same identifier 
+(name{figure.1}) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.349 
-       <./dependency.png>] [7pdfTeX warning (ext4): destination with the same i
-dentifier (name{figure.2}) has been already used, duplicate ignored
-
-\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
-                                                  \fi \fi 
-l.391 
+l.266 
       pdfTeX warning (ext4): destination with the same identifier (name{table.1
 }) has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.391 
-       <./ScopeOutput.png>]
-<scheduler.png, id=290, 1424.32124pt x 436.63126pt>
-File: scheduler.png Graphic file (type png)
-<use scheduler.png>
-Package pdftex.def Info: scheduler.png  used on input line 396.
-(pdftex.def)             Requested size: 380.26768pt x 116.57285pt.
-
-
-LaTeX Warning: Reference `eq:lovely formula' on page 8 undefined on input line 
-412.
-
-
-LaTeX Warning: Reference `fig:frog in multicol' on page 8 undefined on input li
-ne 412.
-
-
-Package natbib Warning: Citation `toadetal1958' on page 8 undefined on input li
-ne 415.
-
-
-Package natbib Warning: Citation `toadetal1958' on page 8 undefined on input li
-ne 415.
-
-
-Package natbib Warning: Citation `squeaker1982' on page 8 undefined on input li
-ne 415.
-
-
-Package natbib Warning: Citation `siddiqi2004interspecific' on page 8 undefined
- on input line 415.
-
-No file motorControlReport.bbl.
-
-Package natbib Warning: There were undefined citations.
-
-[8pdfTeX warning (ext4): destination with the same identifier (name{figure.3}) 
-has been already used, duplicate ignored
+l.266 
+       <./position accuracy.png>] (motor2.cpp) (melody1.cpp) (melody2.cpp)
+[4] (decode1.cpp) (decode2.cpp [5]) (bitcoin1.cpp) [6]
+<dependency.png, id=284, 3009.2425pt x 1495.5875pt>
+File: dependency.png Graphic file (type png)
+<use dependency.png>
+Package pdftex.def Info: dependency.png  used on input line 385.
+(pdftex.def)             Requested size: 380.26768pt x 188.97902pt.
+<ScopeOutput.png, id=285, 1005.7575pt x 754.31813pt>
+File: ScopeOutput.png Graphic file (type png)
+<use ScopeOutput.png>
+Package pdftex.def Info: ScopeOutput.png  used on input line 406.
+(pdftex.def)             Requested size: 253.51608pt x 190.1329pt.
+ [7pdfTeX warning (ext4): destination with the same identifier (name{figure.2})
+ has been already used, duplicate ignored
 
 \AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
                                                   \fi \fi 
-l.425 \end{document}
+l.412 
+       <./dependency.png>]
+<scheduler.png, id=292, 1424.32124pt x 436.63126pt>
+File: scheduler.png Graphic file (type png)
+<use scheduler.png>
+Package pdftex.def Info: scheduler.png  used on input line 459.
+(pdftex.def)             Requested size: 380.26768pt x 116.57285pt.
+ [8pdfTeX warning (ext4): destination with the same identifier (name{figure.3})
+ has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.465 
+      pdfTeX warning (ext4): destination with the same identifier (name{table.2
+}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.465 
+       <./ScopeOutput.png>] [9pdfTeX warning (ext4): destination with the same 
+identifier (name{figure.4}) has been already used, duplicate ignored
+
+\AtBegShi@Output ...ipout \box \AtBeginShipoutBox 
+                                                  \fi \fi 
+l.466 \end{document}
                      <./scheduler.png>]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 425.
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 425.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 466.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 466.
  (motorControlReport.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 425.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 425.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 466.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 466.
 Package rerunfilecheck Info: File `motorControlReport.out' has not changed.
-(rerunfilecheck)             Checksum: 005DA90A534F4F1D1C8CC055018C5771;1381.
-
-
-LaTeX Warning: There were undefined references.
+(rerunfilecheck)             Checksum: A420BD7344C7E7E4FEF6286602FC0D7B;1247.
 
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 425.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 466.
  ) 
 Here is how much of TeX's memory you used:
- 32925 strings out of 492452
- 619114 string characters out of 3120063
- 1117512 words of memory out of 3000000
- 36656 multiletter control sequences out of 15000+200000
+ 32952 strings out of 492452
+ 619616 string characters out of 3120063
+ 1118118 words of memory out of 3000000
+ 36668 multiletter control sequences out of 15000+200000
  538606 words of font info for 46 fonts, out of 3000000 for 9000
  1141 hyphenation exceptions out of 8191
- 78i,12n,99p,974b,2028s stack positions out of 5000i,500n,10000p,200000b,50000s
+ 78i,12n,99p,974b,2030s stack positions out of 5000i,500n,10000p,200000b,50000s
 <C:/Users/Sajid/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts
 /cm/cmbx10.pfb><C:/Users/Sajid/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/pu
 blic/amsfonts/cm/cmbx12.pfb><C:/Users/Sajid/AppData/Local/Programs/MiKTeX 2.9/f
@@ -1413,9 +1407,9 @@ type1/public/amsfonts/cm/cmr5.pfb><C:/Users/Sajid/AppData/Local/Programs/MiKTeX
  2.9/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Users/Sajid/AppData/Local/Prog
 rams/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmsy10.pfb><C:/Users/Sajid/AppDa
 ta/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt8.pfb>
-Output written on motorControlReport.pdf (10 pages, 399418 bytes).
+Output written on motorControlReport.pdf (11 pages, 402761 bytes).
 PDF statistics:
- 370 PDF objects out of 1000 (max. 8388607)
- 157 named destinations out of 1000 (max. 500000)
- 196 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 381 PDF objects out of 1000 (max. 8388607)
+ 169 named destinations out of 1000 (max. 500000)
+ 185 words of extra memory for PDF output out of 10000 (max. 10000000)
 

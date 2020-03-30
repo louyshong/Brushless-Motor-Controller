@@ -96,7 +96,7 @@
 
         \Large
         \textbf{Team Members:}\\
-        Sajid Ali\\
+        Sajid Ali 01341393\\
         Tuck Hong 01336059\\
         Lulwa Alkhalifa 01351905 \\
 
@@ -133,7 +133,17 @@ In this report is summarised the implementation of a brushless motor controller 
 \section{Motor Control Implementation}
 \subsection{Position and Velocity Measurements}
 
-I'm guessing this has probably changed since yesterday. I'm so sorry about that :(
+\noindent
+The code for updating the position and speed of the motor can be found below. The position of the rotor is updated in the ISR whenever the state changes.
+
+\noindent
+The velocity is calculated in the motor control thread every 100ms using the up to date position. A timer is used to calculate the time-elapsed since the last velocity measurement as opposed to assuming its 100ms; this is to improve the accuracy of the result.
+
+\bigskip
+
+\lstinputlisting[language=C++]{posVel.cpp}
+
+
 
 \subsection{Velocity Control}
 
@@ -192,6 +202,49 @@ Combining velocity and position control is done by choosing the most conservativ
 
 \noindent
 A non-linearity is applied the distance error term to prevent oscillations at lower speeds.
+
+\subsection{Accuracy Measurements}
+\noindent
+Once the controller had been implemented and optimised we carried out tests to ensure the specification would be met.
+We varied the target speed of the rotor and measured the steady state velocity (i.e. the velocity when the only constraint on the motor power was the target speed ). We also noted the final position of the rotor and compared it to the target position.
+
+\bigskip
+
+\noindent
+An example of the terminal output is shown below.
+
+\begin{figure}[H]
+\begin{center}
+%\fbox{\rule{0pt}{1in} \rule{0.8\linewidth}{0pt}}
+   \includegraphics[width=0.5\linewidth]{position accuracy.png}
+\end{center}
+   \caption{Sample terminal output.}
+\label{fig:long}
+\label{fig:onecol}
+\end{figure}
+
+\noindent
+The speed of the motor was varied from 10-100 rps by increasing the speed in intervals of 10 rps. As you can see from the results in the table below, the motor consistently meets both performance criteria of speed and distance error with no overshoot.
+
+\begin{table}[ht]
+\centering                      % used for centering table
+\begin{tabular}{c c c c}        % centered columns (4 columns)
+Target Speed (rps) & Target Distance (r) & Actual Distance (r) & Steady State Speed (rps) \\ [0.5ex]   % inserts table %heading
+\hline                          % inserts 1 horizontal line
+10 & 1000.00 & 1000.00 & 10.01 \\           % table contents
+20 & 1000.00 & 1000.00 & 19.97 \\  
+30 & 1000.00 & 1000.00 & 29.99 \\  
+40 & 1000.00 & 1000.00 & 40.01 \\  
+50 & 1000.00 & 1000.00 & 49.85 \\  
+60 & 1000.00 & 1000.00 & 60.01 \\  
+70 & 1000.00 & 1000.00 & 69.94 \\  
+80 & 2000.00 & 1999.50 & 80.01 \\  
+90 & 2000.00 & 2000.00 & 89.97 \\  
+100 & 2000.00 & 1999.50 & 99.98 \\  
+\end{tabular}
+\caption{Position and speed accuracy measurements.}
+\label{table:nonlin}            % is used to refer this table in the text
+\end{table}
 
 \section{Tasks and Dependencies}
 \subsection{Motor Control}
@@ -340,17 +393,17 @@ A dependency this task has is the semaphore-like signal from the timer interrupt
 \subsection{Methodology}
 
 \noindent
-The CPU usage of each task running in the micro-controller was indirectly observed by pulling one of the digital I/O pins high and low to show when a task was executing. Measuring the time the between pulses and the duration of each pulse would tell us the initiation interval and execution time of each task.
+The CPU usage of each task running in the micro-controller was indirectly observed by pulling one of the digital I/O pins high and low to show when a task was executing. Measuring the time between pulses and the duration of each pulse would tell us the initiation interval and execution time of each task.
 
 \bigskip
 
 \noindent
-We used a USB oscilloscope to take the measurements. An example of a trace we obtained is shown in Figure 2.
+We used a USB oscilloscope to take the measurements. An example of a trace we obtained is shown in Figure 3.
 
 \begin{figure}[H]
 \begin{center}
 %\fbox{\rule{0pt}{1in} \rule{0.8\linewidth}{0pt}}
-   \includegraphics[width=0.9\linewidth]{ScopeOutput.png}
+   \includegraphics[width=0.6\linewidth]{ScopeOutput.png}
 \end{center}
    \caption{Picoscope pulse trigger.}
 \label{fig:long}
