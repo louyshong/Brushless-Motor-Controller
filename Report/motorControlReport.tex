@@ -352,6 +352,28 @@ In \textbf{decodeSpeedCommand}, for example, the new maximum speed is written in
 
 \subsection{Outputting Messages}
 
+\noindent
+Our system can print many different types of messages from different threads each of which may require different size and types of data.
+To streamline the code we decided to create a single mail struct which could hold a wide variety of data. This means that the size of print items is longer than it could have been, but it uses fewer lines of code and means we need a queue of only a single type.
+
+\bigskip
+
+\noindent
+Items are added to the print queue through the calling of any of the \textbf{putMessage()} overload functions. Each functions takes a type and a list of data items to pass to the terminal. The \textbf{int type} argument is used by the print thread to output a custom message format for each message type. The message types are defined at the top of the code below.
+
+\bigskip
+\lstinputlisting[language=C++]{output2.cpp}
+\bigskip
+
+\noindent
+Printing messages to the terminal is handled by the \textbf{MessengerThread} which calls the function \textbf{outputToTerminal()}. The functions contains an infinite loop which constantly polls the \textbf{main\_box} to see if the queue is not empty. Once a message is pulled from the queue the type is checked and a custom print format is applied depending on the type. Finally, the \textbf{main\_box} is released.
+
+
+\bigskip
+\lstinputlisting[language=C++]{output.cpp}
+\bigskip
+
+
 \subsection{Bitcoin Mining}
 
 \noindent

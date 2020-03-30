@@ -12,9 +12,9 @@
 \contentsline {subsection}{\numberline {3.2}Melody}{4}{subsection.3.2}% 
 \contentsline {subsection}{\numberline {3.3}Decoding Messages}{5}{subsection.3.3}% 
 \contentsline {subsection}{\numberline {3.4}Outputting Messages}{6}{subsection.3.4}% 
-\contentsline {subsection}{\numberline {3.5}Bitcoin Mining}{6}{subsection.3.5}% 
-\contentsline {subsection}{\numberline {3.6}Dependency Graph}{7}{subsection.3.6}% 
-\contentsline {section}{\numberline {4}Timings and CPU Utilisation}{7}{section.4}% 
-\contentsline {subsection}{\numberline {4.1}Methodology}{7}{subsection.4.1}% 
-\contentsline {subsection}{\numberline {4.2}Measure Results}{8}{subsection.4.2}% 
-\contentsline {subsection}{\numberline {4.3}Critical Instant Analysis of the Rate Monotonic Scheduler}{8}{subsection.4.3}% 
+\contentsline {subsection}{\numberline {3.5}Bitcoin Mining}{7}{subsection.3.5}% 
+\contentsline {subsection}{\numberline {3.6}Dependency Graph}{8}{subsection.3.6}% 
+\contentsline {section}{\numberline {4}Timings and CPU Utilisation}{8}{section.4}% 
+\contentsline {subsection}{\numberline {4.1}Methodology}{8}{subsection.4.1}% 
+\contentsline {subsection}{\numberline {4.2}Measure Results}{9}{subsection.4.2}% 
+\contentsline {subsection}{\numberline {4.3}Critical Instant Analysis of the Rate Monotonic Scheduler}{9}{subsection.4.3}% 

@@ -1,7 +1,7 @@
 //find distance error
 DE = DistanceError(timeElapsed);
 
-// add non-linearity to prevent motor oscillation at small speeds (kills the error is within 0.5 rots)
+// add non-linearity to prevent motor oscillation at small speeds (kills the error if within 0.5 rots)
 if(abs(targetPosition - position) < 3)
 {
     DE = 0;

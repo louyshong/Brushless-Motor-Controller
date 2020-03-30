@@ -1,1 +1,2 @@
-lead = (VE < 0) ? -lead : lead; // torque in opposite direction to slow the motor down
+//set direction of torque
+lead = (DE >= 0) ? 2 : -2;

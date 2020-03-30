@@ -285,7 +285,7 @@ void motorCtrlFn()
             printTimer.reset();
         }
         
-        //update/reset variables
+        //set direction of torque
         lead = (DE >= 0) ? 2 : -2;
 
         //update/reset variables
