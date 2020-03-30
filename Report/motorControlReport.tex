@@ -455,14 +455,14 @@ We used a USB oscilloscope to take the measurements. An example of a trace we ob
 \begin{table}[ht]
 \centering                      % used for centering table
 \begin{tabular}{c c c c}        % centered columns (4 columns)
-Task & Initiation Interval (t) & Execution Time (T) & Task Utilization (U) \\ [0.5ex]   % inserts table %heading
+Task & Initiation Interval (t) & Execution Time (T) & CPU Utilization (U) \\ [0.5ex]   % inserts table %heading
 \hline                          % inserts 1 horizontal line
-Motor ISR & 1.28ms & 5.0us & 0.40\% \\           % table contents
-Output & 1.0s & 101ms & 10.11\% \\
+ISR & 1.28ms & 5.0us & 0.40\% \\           % table contents
+Output & 1.0s & 101us & 10.11\% \\
 Motor Control & 100ms & 75us  & 0.08\% \\
-Decode & 93.75ms & 53us & 0.0565\% \\
+Decode & - & 53us & - \\
 BitCoin Mining & 1.0s & 868ms & 86.8\% \\
-Melody & 0.125s & 1.0us & 0.0008\% \\[1ex]     % [1ex] adds vertical space
+Melody & 0.125s & 1.0us & ~0\% \\[1ex]     % [1ex] adds vertical space
 \end{tabular}
 \caption{Task timing and resource utilization.}
 \label{table:nonlin}            % is used to refer this table in the text
@@ -478,18 +478,52 @@ To test this we will calculate the CPU time used up by every thread within a sin
 \bigskip
 
 \noindent
-We start by assuming that the motor is running at full speed (i.e. 100 rps) and that we are printing to the terminal every second.
+We start by assuming that the motor is running at full speed (i.e. 100 rps). Since the ISR is triggered 6 times per rotation, this means the ISR will execute 600 times per second, or once every 1.7ms for 5us.
 
 \bigskip
 
 \noindent
-Using the table above, this yields 3.6ms and 0.75ms of CPU time for the motor interrupt and motor control threads respectively.
-The final three threads, printing, bitcoin mining, and playing a melody had fixed times and therefore can be added directly.
+For every \textbf{one second} the following tasks must execute:
+\begin{itemize}
+     \item ISR: 600 * 5us = \textbf{3ms}
+     \item Output: \textbf{101us}
+     \item Motor Control: 10 * 75us = \textbf{0.75ms}
+     \item Decode: \textbf{N/A}
+     \item Bitcoin Mining: \textbf{868ms}
+     \item Melody: 8 * 1us = \textbf{8us}
+   \end{itemize}
+
+\noindent
+Adding the CPU time together yields:
+
+\[3ms + 101us + 0.75ms + 868ms + 8us = \textbf{871.9ms} < 1000.0ms\]
+
+\[cpuUtilisation = (871.9 ms / 1000 ms) = \textbf{87.2\%}\]
 
 \bigskip
 
 \noindent
-The results are summarised in the figure below. As you can see, after all the tasks are done executing there is minimum surplus of 30ms which could be used to decoding messages from the user.
+This means theoretically there is enough CPU time for every task to execute.
+
+\bigskip
+
+\noindent
+However, assuming all the tasks want to execute at a critical instance we can plot the execution to see if the tasks finish executing on time.
+
+\bigskip
+
+\noindent
+The main point of contention is will the motor ISR executing every 1.7ms block other critical tasks from completing on time.
+
+\bigskip
+
+\noindent
+The only additional calculation required is the number of bitcoin hashes which must be calculated on average in 1.7ms.
+
+\[hashTime = 0.0017 * 868ms = \textbf{1.48ms}\]
+
+\noindent
+As you can see in the figure below, if every task want to execute at the same time, the scheduling will allow every task to complete and the ISR will be able to meet its deadline.
 
 
 \begin{figure}[H]
